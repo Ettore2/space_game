@@ -10,39 +10,66 @@ let leftFlag = false;
 let rightFlag = false;
 let actionAFlag = false;
 
+let OUT_OF_SCREEN_DIV_WIDTH_PERCENTAGE = 20;
+let DIV_MID_WIDTH_PERCENTAGE = 60;
+let DIV_LEFT_WIDTH_PERCENTAGE = (100 - DIV_MID_WIDTH_PERCENTAGE)/2;
+
 let w = window.innerWidth*100/100;
 let h = window.innerHeight*100/100;
 
 let canvas = document.getElementById("game_canvas");
+
 let pointsText = document.createElement("p");
 let healthText = document.createElement("p");
+let outOfScreenDiv = document.createElement("div");
+outOfScreenDiv.classList.add("out_of_screen_div");
+outOfScreenDiv.style.width = OUT_OF_SCREEN_DIV_WIDTH_PERCENTAGE+"%";
+let outOfScreenText = document.createElement("p");
+outOfScreenText.classList.add("out_of_screen_text");
+outOfScreenDiv.appendChild(outOfScreenText);
+
+let canvasWidthPx
 
 if(h > w){
-    canvas.style.height = w+"px"
-    canvas.style.width = w+"px"
+    canvasWidthPx = w;
     document.getElementById("div_mid").style.width = "100%";
+    document.getElementById("div_mid").style.display = "block";
     document.getElementById("div_left").style.display = "none";
     document.getElementById("div_right").style.display = "none";
     document.getElementById("div_mid").appendChild(healthText)
     document.getElementById("div_mid").appendChild(pointsText)
-
+    document.getElementById("div_mid").appendChild(outOfScreenDiv)
 }else {
     if(h > w*60/100){
-        canvas.style.height = (w*60/100)+"px"
-        canvas.style.width = (w*60/100)+"px"
+        canvasWidthPx = w*DIV_MID_WIDTH_PERCENTAGE/100;
     }else {
-        canvas.style.height = h+"px"
-        canvas.style.width = h+"px"
+        canvasWidthPx = h;
     }
-    document.getElementById("div_mid").style.width = "60%";
-    document.getElementById("div_left").style.width = "20%";
-    document.getElementById("div_right").style.width = "20%";
+    document.getElementById("div_mid").style.width = DIV_MID_WIDTH_PERCENTAGE+"%";
+    document.getElementById("div_left").style.width = DIV_LEFT_WIDTH_PERCENTAGE+"%";
+    document.getElementById("div_right").style.width = DIV_LEFT_WIDTH_PERCENTAGE+"%";
+    document.getElementById("div_mid").style.display = "flex";
     document.getElementById("div_right").appendChild(pointsText)
     document.getElementById("div_left").appendChild(healthText)
+    document.getElementById("div_mid").appendChild(outOfScreenDiv)
 }
+outOfScreenDiv.style.top = canvasWidthPx/3+"px"
+if(h > w){
+    outOfScreenDiv.style.left = (canvasWidthPx - canvasWidthPx*OUT_OF_SCREEN_DIV_WIDTH_PERCENTAGE/100)/2+"px"
+}else {
+    outOfScreenDiv.style.left = (w*DIV_LEFT_WIDTH_PERCENTAGE/100+(canvasWidthPx - canvasWidthPx*OUT_OF_SCREEN_DIV_WIDTH_PERCENTAGE/100)/2)+"px"
+}
+canvas.style.height = canvasWidthPx+"px"
+canvas.style.width = canvasWidthPx+"px"
 
 
-let game = new GameInstance(canvas,FRAMES_DELAY,0,pointsText,healthText);
+let elements = {
+    pointsText : pointsText,
+    healthText : healthText,
+    outOfScreenDiv : outOfScreenDiv,
+    outOfScreenText : outOfScreenText,
+}
+let game = new GameInstance(canvas,FRAMES_DELAY,0,elements);
 
 
 let intervalId = setInterval(function() {

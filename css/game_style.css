@@ -1,3 +1,5 @@
+@font-face { font-family: JuneBug; src: url('JUNEBUG.TTF'); }
+
 body{
     margin: 0;
     padding: 0;
@@ -7,7 +9,30 @@ body{
     overflow: hidden;
     display: flex;
 }
+p{
+    font-size: 4vw;
+    text-size-adjust: auto;
+    text-align: center;
+    font-family: "VT323", monospace;
+}
 #game_canvas{
     margin: auto;
     padding: 0;
+}
+.out_of_screen_text{
+    width: 100%;
+    margin: 10% auto;
+    color: #ffffff;
+    font-weight: bold;
+}
+.out_of_screen_div{
+    height: fit-content;
+    margin: auto;
+    border-radius: 15px;
+    border-style: solid;
+    border-width: 0.5vw;
+    border-color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.06);
+    position: fixed;
+    visibility: hidden;
 }

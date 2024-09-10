@@ -50,14 +50,13 @@ export class GameInstance {
      @param {HTMLCanvasElement} canvas
      @param {int} delay
      @param {int} playerTypeId
-     @param {HTMLElement} pointsText
-     @param {HTMLElement} healthText
+     @param {{}} elements
      */
-    constructor(canvas,delay,playerTypeId,pointsText,healthText) {
+    constructor(canvas,delay,playerTypeId,elements) {
         this.canvas = canvas;
         this.delay = delay;
-        this.pointsText = pointsText;
-        this.healthText = healthText
+        this.elements = elements;
+        this.elements.outOfScreenText.innerText=Player.OUTSIDE_THE_SCREEN_TIME+"";
 
         this.managedObjs = [];
         this.toAddObj = [];
@@ -75,7 +74,7 @@ export class GameInstance {
             [100]
         ];
         this.points = 0;
-        this.pointsText.innerText = this.points;
+        this.elements.pointsText.innerText = this.points;
         this.maxAsteroids = 20;
         this.currAsteroids = 0
         this.asteroidsSpawnTime = 800;
@@ -84,7 +83,7 @@ export class GameInstance {
 
         this.player = new Player(playerTypeId,GameInstance.PIXELS_NUMBER/2,GameInstance.PIXELS_NUMBER/2,this);
         this.managedObjs.push(this.player);
-        this.healthText.innerText = this.player.health+"";
+        this.elements.healthText.innerText = this.player.health+"";
         //this.managedObjs.push(AsteroidBlueprint.createAsteroid(0,0,200,200,this));
     }
 
@@ -242,7 +241,7 @@ export class GameInstance {
     }
     increasePoints(amount){
         this.points += amount;
-        this.pointsText.innerText = this.points;
+        this.elements.pointsText.innerText = this.points;
     }
 }
 export class GameObject {
@@ -313,6 +312,9 @@ export class GameObject {
                 this.die();
             }
         }
+    }
+    isInsideTheScreen(){
+        return this.posX > 0 && this.posX < GameInstance.PIXELS_NUMBER && this.posY > 0 && this.posY < GameInstance.PIXELS_NUMBER
     }
 
 
@@ -578,14 +580,11 @@ export class AsteroidBlueprint extends GameObject{
         }
     }
 
-    isInsideTheScreen(){
-        return this.posX > 0 && this.posX < GameInstance.PIXELS_NUMBER && this.posY > 0 && this.posY < GameInstance.PIXELS_NUMBER
-    }
-
 }
 export class Player extends GameObject{
     static ACTION_A = "a";
     static TAG = "player";
+    static OUTSIDE_THE_SCREEN_TIME = 3000;
 
     static statsRegistry = [
         {
@@ -612,6 +611,7 @@ export class Player extends GameObject{
         this.stats = Player.statsRegistry[type];
         this.timerActionA = this.stats.actADelay;
         this.invincibilityTime = this.stats.invincibilityTime;
+        this.timerOutsideTheScreen = Player.OUTSIDE_THE_SCREEN_TIME;
 
         this.hitBlinckTime = 160;
     }
@@ -699,6 +699,21 @@ export class Player extends GameObject{
             this.actA();
         }
 
+        if(!this.isInsideTheScreen()){
+            this.game.elements.outOfScreenDiv.style.visibility = "visible"
+            if(this.timerOutsideTheScreen > 0){
+                this.timerOutsideTheScreen -= deltaT
+            }else {
+                this.takeDamage(this.health);
+            }
+            this.game.elements.outOfScreenText.innerText = this.timerOutsideTheScreen+"";
+        }else{
+            this.game.elements.outOfScreenDiv.style.visibility = "hidden"
+            if(this.timerOutsideTheScreen !== Player.OUTSIDE_THE_SCREEN_TIME){
+                this.timerOutsideTheScreen = Player.OUTSIDE_THE_SCREEN_TIME;
+            }
+        }
+
 
         super.logicUpdate(deltaT);
         //console.log(this.posX+"   "+this.posY)
@@ -713,16 +728,18 @@ export class Player extends GameObject{
         super.graphicUpdate(deltaT);
     }
     heal(amount){
-        this.health += amount;
-        if(this.health > this.stats.maxHealth){
-            this.health = this.stats.maxHealth;
+        if(this.alive){
+            this.health += amount;
+            if(this.health > this.stats.maxHealth){
+                this.health = this.stats.maxHealth;
+            }
+            this.game.elements.healthText.innerText = this.health+"";
         }
-        this.game.healthText.innerText = this.health+"";
     }
     takeDamage(dmg) {
         if(this.timerInvincibility <= 0 && dmg > 0){
             super.takeDamage(dmg);
-            this.game.healthText.innerText = this.health+"";
+            this.game.elements.healthText.innerText = this.health+"";
         }
     }
 
