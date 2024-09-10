@@ -34,6 +34,8 @@ function arrayRemove(arr, value) {
 
 }
 
+const IMGS_DIR = "../sprites/";
+
 
 export class GameInstance {
     static STATE_PLAY = 1;
@@ -450,7 +452,7 @@ export class AsteroidBlueprint extends GameObject{
     getImgFromPool(){
         let img = new Image();
         let index = Math.floor(Math.random()*(this.stats.images.length))
-        img.src = "sprites/"+this.stats.images[Math.floor(Math.random()*this.stats.images.length)]
+        img.src = IMGS_DIR+this.stats.images[Math.floor(Math.random()*this.stats.images.length)]
         //console.log(img.src)
         return img;
     }
@@ -620,7 +622,7 @@ export class Player extends GameObject{
      */
     getImgFromPool(type){
         let img = new Image();
-        img.src = "sprites/"+Player.statsRegistry[type].img;
+        img.src = IMGS_DIR+Player.statsRegistry[type].img;
         return img;
     }
     die(){
@@ -799,7 +801,7 @@ export class Bullet extends GameObject{
     }
     getImgFromPool(type){
         let img = new Image();
-        img.src = "sprites/"+Bullet.statsRegistry[type].img;
+        img.src = IMGS_DIR+Bullet.statsRegistry[type].img;
         return img;
     }
     logicUpdate(deltaT) {
