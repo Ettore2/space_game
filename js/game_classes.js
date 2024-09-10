@@ -50,13 +50,15 @@ export class GameInstance {
      @param {HTMLCanvasElement} canvas
      @param {int} delay
      @param {int} playerTypeId
+     @param {int} gameModeId
      @param {{}} elements
      */
-    constructor(canvas,delay,playerTypeId,elements) {
+    constructor(canvas,delay,playerTypeId,gameModeId,elements) {
         this.canvas = canvas;
         this.delay = delay;
         this.elements = elements;
         this.elements.outOfScreenText.innerText=Player.OUTSIDE_THE_SCREEN_TIME+"";
+        this.gameMode = GameMode.getGameMode(gameModeId,this);
 
         this.managedObjs = [];
         this.toAddObj = [];
@@ -68,20 +70,12 @@ export class GameInstance {
 
         this.ctx = canvas.getContext("2d");
 
-        this.asteroidsTypesSpawnRate = [80,20];
-        this.asteroidsSizesSpawnRate = [
-            [60,30,10],
-            [100]
-        ];
-        this.points = 0;
-        this.elements.pointsText.innerText = this.points;
-        this.maxAsteroids = 20;
-        this.currAsteroids = 0
-        this.asteroidsSpawnTime = 800;
-        this.timerSapwnAsteroids = this.asteroidsSpawnTime;
+
         this.gameState = GameInstance.STATE_PLAY;
 
+
         this.player = new Player(playerTypeId,GameInstance.PIXELS_NUMBER/2,GameInstance.PIXELS_NUMBER/2,this);
+        this.elements.healthImg.src = this.player.image.src;
         this.managedObjs.push(this.player);
         this.elements.healthText.innerText = this.player.health+"";
         //this.managedObjs.push(AsteroidBlueprint.createAsteroid(0,0,200,200,this));
@@ -115,60 +109,7 @@ export class GameInstance {
                 //console.log(this.managedObjs);
                 //console.log("toAddObj: "+this.toAddObj.length);
 
-                //create new asteroids
-                if(this.timerSapwnAsteroids < this.asteroidsSpawnTime){
-                    this.timerSapwnAsteroids += this.delay
-                }
-                if(this.timerSapwnAsteroids >= this.asteroidsSpawnTime && this.currAsteroids < this.maxAsteroids){
-                    this.timerSapwnAsteroids -= this.asteroidsSpawnTime;
-                    //spawn an asteroid
-                    let tmp;
-                    let rand;
-
-                    //choose the type
-                    let chosenType = 0;//= 0 important
-                    tmp = 0;//= 0 important
-                    for(let i = 0; i < this.asteroidsTypesSpawnRate.length; i++){
-                        tmp += this.asteroidsTypesSpawnRate[i];
-                    }
-                    rand = Math.floor(Math.random()*(tmp+1));
-                    for(let i = 0; rand > 0; i++){
-                        rand -= this.asteroidsTypesSpawnRate[i];
-                        if(rand <= 0){
-                            chosenType = i;
-                        }
-                    }
-
-                    //choose the type
-                    let chosenSize = 0;//= 0 important
-                    tmp = 0;//= 0 important
-                    for(let i = 0; i < this.asteroidsSizesSpawnRate.length; i++){
-                        tmp += this.asteroidsTypesSpawnRate[i];
-                    }
-                    rand = Math.floor(Math.random()*(tmp+1));
-                    for(let i = 0; rand > 0; i++){
-                        if(this.asteroidsSizesSpawnRate[chosenType][i] > 0){
-                            rand -= this.asteroidsSizesSpawnRate[chosenType][i];
-                            if(rand <= 0){
-                                chosenSize = i;
-                            }
-
-                        }
-                    }
-
-                    //chose the pos
-                    let x = Math.random()*(GameInstance.ASTEROIDS_SPAWN_SPACE*2)
-                    x = x > GameInstance.ASTEROIDS_SPAWN_SPACE ? x + GameInstance.PIXELS_NUMBER : -x
-                    let y = Math.random()*(GameInstance.ASTEROIDS_SPAWN_SPACE*2)
-                    y = y > GameInstance.ASTEROIDS_SPAWN_SPACE ? y + GameInstance.PIXELS_NUMBER : -y
-
-                    //spawn
-                    this.managedObjs.push(AsteroidBlueprint.createAsteroid(chosenType,chosenSize,x,y,this));
-
-                }
-
-
-
+                this.gameMode.loop(this.delay);
 
                 for(let i = this.managedObjs.length-1; i >= 0; i--){
                     this.managedObjs[i].logicUpdate(this.delay);
@@ -238,10 +179,6 @@ export class GameInstance {
                 break
         }
 
-    }
-    increasePoints(amount){
-        this.points += amount;
-        this.elements.pointsText.innerText = this.points;
     }
 }
 export class GameObject {
@@ -441,7 +378,7 @@ export class AsteroidBlueprint extends GameObject{
         let v = this.getNewSpeed()
         this.velX = v['x'];
         this.velY = v['y'];
-        this.game.currAsteroids ++;
+        this.game.gameMode.currAsteroids ++;
     }
     static createAsteroid(type,size, x, y, game){
         let obj_class
@@ -482,8 +419,11 @@ export class AsteroidBlueprint extends GameObject{
     die(){
         if(this.alive){
             super.die()
-            this.game.currAsteroids --;
-            this.game.increasePoints(1);
+            this.game.gameMode.currAsteroids --;
+            if(this.game.gameMode.getPointsFromASteroids){
+                this.game.gameMode.increasePoints(1);
+            }
+
 
             if(this.size > 0 && this.stats.children > 0){
                 for(let i = 0; i < this.stats.children; i++){
@@ -870,3 +810,121 @@ export class HealthAsteroid extends AsteroidBlueprint{
         }
     }
 }
+export class GameMode{
+    static TOTAL_GAME_MODES = 1;
+
+    /**
+     @param {String} name
+     @param {String} objectiveImg
+     @param {GameInstance} game
+     */
+    constructor(name, objectiveImg,game) {
+        this.objectiveImg = IMGS_DIR + objectiveImg;
+        this.name = name;
+        this.game = game;
+        this.game.elements.pointsImg.src = this.objectiveImg;
+
+
+        this.spawnAsteroids = true;
+        this.getPointsFromASteroids = true;
+        this.asteroidsTypesSpawnRate = [80,20];
+        this.asteroidsSizesSpawnRate = [
+            [60,30,10],
+            [100]
+        ];
+        this.points = 0;
+        this.game.elements.pointsText.innerText = this.points;
+        this.maxAsteroids = 20;
+        this.currAsteroids = 0
+        this.asteroidsSpawnTime = 800;
+        this.timerSapwnAsteroids = this.asteroidsSpawnTime;
+    }
+    /**
+     @param {int} gameModeId
+     @param {GameInstance} game
+     */
+    static getGameMode(gameModeId,game){
+        switch (gameModeId){
+            case 0: return new GameModeDestroyAsteroids(game);
+            default: return null;
+        }
+    }
+    /**
+     @param {int} deltaT
+     */
+    loop(deltaT){
+        //create new asteroids
+        if(this.spawnAsteroids){
+            if(this.timerSapwnAsteroids < this.asteroidsSpawnTime){
+                this.timerSapwnAsteroids += deltaT;
+            }
+            if(this.timerSapwnAsteroids >= this.asteroidsSpawnTime && this.currAsteroids < this.maxAsteroids){
+                this.timerSapwnAsteroids -= this.asteroidsSpawnTime;
+                //spawn an asteroid
+                let tmp;
+                let rand;
+
+                //choose the type
+                let chosenType = 0;//= 0 important
+                tmp = 0;//= 0 important
+                for(let i = 0; i < this.asteroidsTypesSpawnRate.length; i++){
+                    tmp += this.asteroidsTypesSpawnRate[i];
+                }
+                rand = Math.floor(Math.random()*(tmp+1));
+                for(let i = 0; rand > 0; i++){
+                    rand -= this.asteroidsTypesSpawnRate[i];
+                    if(rand <= 0){
+                        chosenType = i;
+                    }
+                }
+
+                //choose the type
+                let chosenSize = 0;//= 0 important
+                tmp = 0;//= 0 important
+                for(let i = 0; i < this.asteroidsSizesSpawnRate.length; i++){
+                    tmp += this.asteroidsTypesSpawnRate[i];
+                }
+                rand = Math.floor(Math.random()*(tmp+1));
+                for(let i = 0; rand > 0; i++){
+                    if(this.asteroidsSizesSpawnRate[chosenType][i] > 0){
+                        rand -= this.asteroidsSizesSpawnRate[chosenType][i];
+                        if(rand <= 0){
+                            chosenSize = i;
+                        }
+
+                    }
+                }
+
+                //chose the pos
+                let x = Math.random()*(GameInstance.ASTEROIDS_SPAWN_SPACE*2)
+                x = x > GameInstance.ASTEROIDS_SPAWN_SPACE ? x + GameInstance.PIXELS_NUMBER : -x
+                let y = Math.random()*(GameInstance.ASTEROIDS_SPAWN_SPACE*2)
+                y = y > GameInstance.ASTEROIDS_SPAWN_SPACE ? y + GameInstance.PIXELS_NUMBER : -y
+
+                //spawn
+                this.game.managedObjs.push(AsteroidBlueprint.createAsteroid(chosenType,chosenSize,x,y,this.game));
+
+            }
+        }
+    }
+    increasePoints(amount){
+        this.points += amount;
+        this.game.elements.pointsText.innerText = this.points;
+    }
+}
+export class GameModeDestroyAsteroids extends GameMode{
+    /**
+     @param {GameInstance} game
+     */
+    constructor(game) {
+        super("destroy asteroids","asteroid_mega_1.png",game);
+    }
+    /**
+     @param {int} deltaT
+     */
+    loop(deltaT){
+        super.loop(deltaT);
+    }
+
+}
+
