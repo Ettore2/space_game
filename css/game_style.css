@@ -7,12 +7,17 @@ body{
     background-color: dimgrey;
     overflow: hidden;
     display: flex;
+    overscroll-behavior-y: contain;
 }
 p{
     font-size: 4vw;
     text-size-adjust: auto;
     text-align: center;
     font-family: "VT323", monospace;
+
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 #game_canvas{
     margin: auto;

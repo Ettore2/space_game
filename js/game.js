@@ -1,4 +1,4 @@
-import {GameInstance, GameObject, Player} from "./game_classes.js";
+import {GameInstance, GameObject, Joystick, Player} from "./game_classes.js";
 const FRAMES_DELAY = 20;
 
 let keyUp = "w";
@@ -13,6 +13,11 @@ let actionAFlag = false;
 let OUT_OF_SCREEN_DIV_WIDTH_PERCENTAGE = 20;
 let DIV_MID_WIDTH_PERCENTAGE = 60;
 let DIV_LEFT_WIDTH_PERCENTAGE = (100 - DIV_MID_WIDTH_PERCENTAGE)/2;
+let JOYSTICK_SIZE_PERCENTAGE = 80;
+
+let divLeft = document.getElementById("div_left")
+let divMid = document.getElementById("div_mid")
+let divRight = document.getElementById("div_right")
 
 let w = window.innerWidth*100/100;
 let h = window.innerHeight*100/100;
@@ -47,40 +52,61 @@ outOfScreenDiv.style.width = OUT_OF_SCREEN_DIV_WIDTH_PERCENTAGE+"%";
 let outOfScreenText = document.createElement("p");
 outOfScreenText.classList.add("out_of_screen_text");
 outOfScreenDiv.appendChild(outOfScreenText);
+let joystickDiv= document.createElement("div");
+let joystickCanvas = document.createElement("canvas");
+joystickDiv.appendChild(joystickCanvas);
+joystickDiv.style.width ="fit-content"
+joystickDiv.style.height ="fit-content"
+joystickDiv.style.padding="2%";
 
 let canvasWidthPx
+let joystickSize
 
 if(h > w){
     canvasWidthPx = w;
-    document.getElementById("div_mid").style.width = "100%";
-    document.getElementById("div_mid").style.display = "block";
-    document.getElementById("div_left").style.display = "none";
-    document.getElementById("div_right").style.display = "none";
+    divMid.style.width = "100%";
+    divMid.style.height = h+"px";
+    divMid.style.display = "block";
+    divLeft.style.display = "none";
+    divRight.style.display = "none";
     let divTmp = document.createElement("div");
     divTmp.style.display = "flex"
     divTmp.appendChild(healthDiv)
     divTmp.appendChild(pointsDiv)
-    document.getElementById("div_mid").appendChild(divTmp)
+
+
+    divMid.appendChild(divTmp)
+    divMid.appendChild(joystickDiv)
+
+    joystickSize = w*JOYSTICK_SIZE_PERCENTAGE/100/2;
+    console.log(divMid.getBoundingClientRect().height)
+    console.log(canvas.getBoundingClientRect().height)
+    console.log(divTmp.getBoundingClientRect().height)
+    joystickDiv.style.margin = (divMid.getBoundingClientRect().height*95/100-joystickSize-canvasWidthPx-divTmp.getBoundingClientRect().height)+"px auto 0px 0px";
 }else {
     if(h > w*60/100){
         canvasWidthPx = w*DIV_MID_WIDTH_PERCENTAGE/100;
     }else {
         canvasWidthPx = h;
     }
-    document.getElementById("div_mid").style.width = DIV_MID_WIDTH_PERCENTAGE+"%";
-    document.getElementById("div_left").style.width = DIV_LEFT_WIDTH_PERCENTAGE+"%";
-    document.getElementById("div_right").style.width = DIV_LEFT_WIDTH_PERCENTAGE+"%";
-    document.getElementById("div_mid").style.display = "flex";
-    document.getElementById("div_right").appendChild(pointsDiv)
-    document.getElementById("div_left").appendChild(healthDiv)
-    document.getElementById("div_mid").appendChild(outOfScreenDiv)
-}
+    divMid.style.width = DIV_MID_WIDTH_PERCENTAGE+"%";
+    divLeft.style.width = DIV_LEFT_WIDTH_PERCENTAGE+"%";
+    divRight.style.width = DIV_LEFT_WIDTH_PERCENTAGE+"%";
+    divMid.style.display = "flex";
+    divRight.appendChild(pointsDiv)
+    divLeft.appendChild(healthDiv)
+    divLeft.appendChild(joystickDiv)
+    divMid.appendChild(outOfScreenDiv)
+
+    joystickSize = divLeft.getBoundingClientRect().width*JOYSTICK_SIZE_PERCENTAGE/100;
+    joystickDiv.style.margin = (divMid.getBoundingClientRect().height*95/100-joystickSize)+"px auto 0% auto";
+}//build the screen
 outOfScreenDiv.style.top = canvasWidthPx/3+"px"
 if(h > w){
     outOfScreenDiv.style.left = (canvasWidthPx - canvasWidthPx*OUT_OF_SCREEN_DIV_WIDTH_PERCENTAGE/100)/2+"px"
 }else {
     outOfScreenDiv.style.left = (w*DIV_LEFT_WIDTH_PERCENTAGE/100+(canvasWidthPx - canvasWidthPx*OUT_OF_SCREEN_DIV_WIDTH_PERCENTAGE/100)/2)+"px"
-}
+}//set game canvas size
 canvas.style.height = canvasWidthPx+"px"
 canvas.style.width = canvasWidthPx+"px"
 
@@ -95,7 +121,8 @@ let elements = {
 
 }
 let game = new GameInstance(canvas,FRAMES_DELAY,0,0,elements);
-
+let joystick = new Joystick(joystickCanvas,joystickSize,joystickSize,joystickSize*25/100,joystickSize*19/100,joystickSize*2/100,joystickSize*50/100);
+Joystick.initializeListeners(joystick);
 
 let intervalId = setInterval(function() {
     if(upFlag){

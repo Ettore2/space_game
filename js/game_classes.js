@@ -927,4 +927,163 @@ export class GameModeDestroyAsteroids extends GameMode{
     }
 
 }
+export class Joystick{
+
+    constructor(canvas,width,height,baseRadius,joystickRadius,joystickBorderRadius,initialInteractionRadius) {
+        this.canvas = canvas;
+        this.canvas.style.margin = "0";//important, put it in a div and center that
+        this.canvas.style.padding = "0";//important, put it in a div and center that
+        this.ctx = canvas.getContext('2d');
+        this.ctx.setTransform(1,0,0,1,0,0);
+        //set the number of pixels of canvas component size (weird things if desync with canvas's canvas size)
+        canvas.style.width = width+"px";
+        canvas.style.height = height+"px";
+        //set the number of pixels of canvas's canvas
+        canvas.width = width;
+        canvas.height = height;
+        this.baseRadius = baseRadius;
+        this.joystickRadius = joystickRadius;
+        this.joystickBorderRadius = joystickBorderRadius;
+        this.initialInteractionRadius = initialInteractionRadius;
+
+        this.x_orig = this.canvas.width / 2;
+        this.y_orig = this.canvas.height / 2;
+        this.validTouch = false;
+        this.coord = { x: 0, y: 0 };//pos relative to canvas up right
+        this.paint = false;
+        this.resize();
+
+        this.angle_in_degrees = 0;
+        this.speed =  0;
+        this.x_relative = 0;
+        this.y_relative = 0;
+
+
+    }
+
+    static initializeListeners(Joystick){
+        document.addEventListener('mousedown', function() {Joystick.startDrawing(event)});
+        document.addEventListener('mouseup', function() {Joystick.stopDrawing(event)});
+        document.addEventListener('mousemove', function() {Joystick.Draw(event)});
+
+        document.addEventListener('touchstart', function() {Joystick.startDrawing(event)});
+        document.addEventListener('touchend', function() {Joystick.stopDrawing(event)});
+        document.addEventListener('touchcancel', function() {Joystick.stopDrawing(event)});
+        document.addEventListener('touchmove', function() {Joystick.Draw(event)});
+        window.addEventListener('resize', function() {Joystick.resize(event)});
+    }
+
+    resize() {
+        /*
+        this.canvas.style.width = width;
+        this.canvas.style.height = height;
+        this.canvas.width = width;
+        this.canvas.height = height;
+    */
+        this.background();
+        this.joystick(this.x_orig, this.y_orig);
+    }
+    background() {
+
+        this.ctx.beginPath();
+        this.ctx.arc(this.x_orig, this.y_orig, this.baseRadius, 0, Math.PI * 2, true);
+        this.ctx.fillStyle = '#4c4a4a';
+        this.ctx.fill();
+    }
+    joystick(width, height) {
+        this.ctx.beginPath();
+        this.ctx.arc(width, height, this.joystickRadius, 0, Math.PI * 2, true);
+        this.ctx.fillStyle = '#c50000';
+        this.ctx.fill();
+        this.ctx.strokeStyle = '#e30000';
+        this.ctx.lineWidth = this.joystickBorderRadius;
+        this.ctx.stroke();
+    }
+    getPosition(event) {
+        if(event != null){
+            var mouse_x = event.clientX || event.touches[0].clientX;
+            var mouse_y = event.clientY || event.touches[0].clientY;
+
+            this.coord.x = mouse_x - this.canvas.offsetLeft;
+            this.coord.y = mouse_y - this.canvas.offsetTop;
+        }
+    }
+    is_it_in_the_base_circle() {
+        var current_radius = Math.sqrt(Math.pow(this.coord.x - this.x_orig, 2) + Math.pow(this.coord.y - this.y_orig, 2));
+        if (this.baseRadius >= current_radius) return true
+        else return false
+    }
+    startDrawing(event) {
+        this.paint = true;
+        this.getPosition(event);
+        this.validTouch = this.isPosAcceptable();
+        if(this.validTouch){
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.background();
+        this.joystick(this.coord.x, this.coord.y);
+        this.Draw();
+        }
+    }
+    isPosAcceptable(){
+        if(this.initialInteractionRadius < 0){
+            return true;
+        }
+
+        let xTmp = this.x_orig - this.coord.x, yTmp = this.y_orig - this.coord.y;
+        return Math.sqrt(Math.pow(xTmp,2)+Math.pow(yTmp,2)) <= this.initialInteractionRadius;
+
+    }
+    stopDrawing() {
+        this.paint = false;
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.background();
+        this.joystick(this.x_orig, this.y_orig);
+
+        this.angle_in_degrees = 0;
+        this.speed =  0;
+        this.x_relative = 0;
+        this.y_relative = 0;
+
+    }
+    Draw(event) {
+
+        if(this.validTouch){
+            //console.log(this.x_orig+"  "+this.y_orig)
+            if (this.paint) {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.background();
+                var x, y;
+                var angle = Math.atan2((this.coord.y - this.y_orig), (this.coord.x - this.x_orig));
+
+                if (Math.sign(angle) == -1) {
+                    this.angle_in_degrees = Math.round(-angle * 180 / Math.PI);
+                }
+                else {
+                    this.angle_in_degrees =Math.round( 360 - angle * 180 / Math.PI);
+                }
+
+
+                if (this.is_it_in_the_base_circle()) {
+                    this.joystick(this.coord.x, this.coord.y);
+                    x = this.coord.x;
+                    y = this.coord.y;
+                }
+                else {
+                    x = this.baseRadius * Math.cos(angle) + this.x_orig;
+                    y = this.baseRadius * Math.sin(angle) + this.y_orig;
+                    this.joystick(x, y);
+                }
+
+
+                this.getPosition(event);
+
+                this.speed =  Math.round(100 * Math.sqrt(Math.pow(x - this.x_orig, 2) + Math.pow(y - this.y_orig, 2)) / this.baseRadius);
+
+                this.x_relative = Math.round(x - this.x_orig);
+                this.y_relative = Math.round(y - this.y_orig);
+
+            }
+        }
+    }
+}
 
