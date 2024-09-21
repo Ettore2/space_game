@@ -538,7 +538,7 @@ export class Player extends GameObject{
             actADelay: 400,
             rotSpeed: 4,
             bulletType: 0,
-            invincibilityTime: 500
+            invincibilityTime: 800
         }
     ];
 
