@@ -13,7 +13,7 @@ let actionAFlag = false;
 let OUT_OF_SCREEN_DIV_WIDTH_PERCENTAGE = 20;
 let DIV_MID_WIDTH_PERCENTAGE = 60;
 let DIV_LEFT_WIDTH_PERCENTAGE = (100 - DIV_MID_WIDTH_PERCENTAGE)/2;
-let JOYSTICK_SIZE_PERCENTAGE = 90;
+let JOYSTICK_SIZE_PERCENTAGE = 100;
 
 let divLeft = document.getElementById("div_left")
 let divMid = document.getElementById("div_mid")
@@ -121,19 +121,37 @@ let elements = {
 
 }
 let game = new GameInstance(canvas,FRAMES_DELAY,0,0,elements);
-let joystick = new Joystick(joystickCanvas,joystickSize,joystickSize,joystickSize*25/100,joystickSize*19/100,joystickSize*2/100,joystickSize*50/100);
+let joystick = new Joystick(joystickCanvas,joystickSize,joystickSize,joystickSize*30/100,joystickSize*14/100,joystickSize*2/100,joystickSize*50/100);
+joystick.setRotationOffset(0);
 Joystick.initializeListeners(joystick);
 
 let intervalId = setInterval(function() {
-    if(upFlag){
+    if(upFlag || joystick.speed >= 85){
         game.player.setInput(GameObject.DIR_UP);
     }
+
     if(leftFlag){
         game.player.setInput(GameObject.DIR_LEFT);
     }
     if(rightFlag){
         game.player.setInput(GameObject.DIR_RIGHT);
     }
+
+    if(joystick.speed > 0){
+        //console.log(joystick.angle_in_degrees);
+        console.log(joystick.angle_in_degrees +"     "+ game.player.rot)
+        //console.log(Math.abs(joystick.angle_in_degrees - game.player.rot) +"     "+ game.player.stats.rotSpeed*2)
+        //console.log("------------------------------------")
+    }
+    if(Math.abs(joystick.angle_in_degrees - game.player.rot) > game.player.stats.rotSpeed*2.5 && joystick.speed > 0){
+        if((joystick.angle_in_degrees +360 - game.player.rot)%360 > 180){
+            game.player.setInput(GameObject.DIR_RIGHT);
+        }else{
+            game.player.setInput(GameObject.DIR_LEFT);
+        }
+    }
+
+
     if(actionAFlag){
         game.player.setInput(Player.ACTION_A);
     }

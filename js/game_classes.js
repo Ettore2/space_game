@@ -4,7 +4,7 @@ function drawImage2(game,img, x, y, scale, rotation){
     //console.log(img);
 
     game.ctx.setTransform(scale, 0, 0, scale, x, y); // sets scale and origin
-    game.ctx.rotate(degreesToRads(rotation));
+    game.ctx.rotate(degreesToRads(-rotation));
     game.ctx.drawImage(img, -img.width / 2, -img.height / 2);
     game.ctx.setTransform(1,0,0,1,0,0);
 }
@@ -109,7 +109,7 @@ export class GameInstance {
                 //console.log(this.managedObjs);
                 //console.log("toAddObj: "+this.toAddObj.length);
 
-                this.gameMode.loop(this.delay);
+                //this.gameMode.loop(this.delay);
 
                 for(let i = this.managedObjs.length-1; i >= 0; i--){
                     this.managedObjs[i].logicUpdate(this.delay);
@@ -253,6 +253,12 @@ export class GameObject {
     isInsideTheScreen(){
         return this.posX > 0 && this.posX < GameInstance.PIXELS_NUMBER && this.posY > 0 && this.posY < GameInstance.PIXELS_NUMBER
     }
+    normalizeRot(){
+        this.rot = this.rot%360;
+        if(this.rot < 0){
+            this.rot = 360 + this.rot;
+        }
+    }
 
 
     //updates
@@ -263,6 +269,7 @@ export class GameObject {
         this.posX += this.velX
         this.posY += this.velY
         this.rot += this.velRot;
+        this.normalizeRot();
         this.registeredCollisions = [];
         if(this.timerInvincibility > 0){
             this.timerInvincibility -= deltaT;
@@ -543,7 +550,7 @@ export class Player extends GameObject{
     ];
 
     constructor(type, x, y, game) {
-        super(Player.statsRegistry[type].maxHealth, x, y,270,"" , Player.statsRegistry[type].collider,game);
+        super(Player.statsRegistry[type].maxHealth, x, y,90,"" , Player.statsRegistry[type].collider,game);
         this.tag = Player.TAG;
 
         this.type = type;
@@ -604,7 +611,7 @@ export class Player extends GameObject{
         if(this.inputUp){
             //console.log("up inp");
             this.velX += Math.cos(degreesToRads(this.rot))*this.stats.acc;
-            this.velY += Math.sin(degreesToRads(this.rot))*this.stats.acc;
+            this.velY -= Math.sin(degreesToRads(this.rot))*this.stats.acc;
             //console.log(this.rot)
             //console.log((Math.cos(degreesToRads(this.rot)))+"   "+(Math.sin(degreesToRads(this.rot))))
             //console.log((Math.cos(degreesToRads(this.rot))*this.stats.acc)+"   "+(Math.sin(degreesToRads(this.rot))*this.stats.acc))
@@ -619,12 +626,12 @@ export class Player extends GameObject{
         }
         if(this.inputLeft && ! this.inputRight){
             //console.log("rot -");
-            this.rot -= this.stats.rotSpeed;
+            this.rot += this.stats.rotSpeed;
             this.rot = this.rot%360;
         }
         if(! this.inputLeft && this.inputRight){
             //console.log("rot +");
-            this.rot += this.stats.rotSpeed;
+            this.rot -= this.stats.rotSpeed;
             this.rot = this.rot%360;
         }
 
@@ -945,6 +952,7 @@ export class Joystick{
         this.joystickRadius = joystickRadius;
         this.joystickBorderRadius = joystickBorderRadius;
         this.initialInteractionRadius = initialInteractionRadius;
+        this.rotationOffset = 0;
 
         this.x_orig = this.canvas.width / 2;
         this.y_orig = this.canvas.height / 2;
@@ -1082,11 +1090,15 @@ export class Joystick{
                 var angle = Math.atan2((this.coord.y - this.y_orig), (this.coord.x - this.x_orig));
 
                 if (Math.sign(angle) == -1) {
-                    this.angle_in_degrees = Math.round(-angle * 180 / Math.PI);
+                    this.angle_in_degrees = Math.round(- angle * 180 / Math.PI);
                 }
                 else {
-                    this.angle_in_degrees =Math.round( 360 - angle * 180 / Math.PI);
+                    this.angle_in_degrees = Math.round( 360 - angle * 180 / Math.PI);
                 }
+
+                //console.log((this.angle_in_degrees+this.rotationOffset)%360)
+                //this.angle_in_degrees = (this.angle_in_degrees+this.rotationOffset)%360;
+                //console.log("ww")
 
 
                 if (this.is_it_in_the_base_circle()) {
@@ -1110,6 +1122,13 @@ export class Joystick{
 
             }
         }
+    }
+    setRotationOffset(rot){
+        this.rotationOffset = rot%360;
+        if(this.rotationOffset < 0){
+            this.rotationOffset = 360 + this.rotationOffset;
+        }
+
     }
 }
 
