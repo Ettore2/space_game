@@ -13,7 +13,7 @@ let actionAFlag = false;
 let OUT_OF_SCREEN_DIV_WIDTH_PERCENTAGE = 20;
 let DIV_MID_WIDTH_PERCENTAGE = 60;
 let DIV_LEFT_WIDTH_PERCENTAGE = (100 - DIV_MID_WIDTH_PERCENTAGE)/2;
-let JOYSTICK_SIZE_PERCENTAGE = 80;
+let JOYSTICK_SIZE_PERCENTAGE = 90;
 
 let divLeft = document.getElementById("div_left")
 let divMid = document.getElementById("div_mid")
@@ -79,9 +79,9 @@ if(h > w){
     divMid.appendChild(joystickDiv)
 
     joystickSize = w*JOYSTICK_SIZE_PERCENTAGE/100/2;
-    console.log(divMid.getBoundingClientRect().height)
-    console.log(canvas.getBoundingClientRect().height)
-    console.log(divTmp.getBoundingClientRect().height)
+    //console.log(divMid.getBoundingClientRect().height)
+    //console.log(canvas.getBoundingClientRect().height)
+    //console.log(divTmp.getBoundingClientRect().height)
     joystickDiv.style.margin = (divMid.getBoundingClientRect().height*95/100-joystickSize-canvasWidthPx-divTmp.getBoundingClientRect().height)+"px auto 0px 0px";
 }else {
     if(h > w*60/100){

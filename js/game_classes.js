@@ -1001,11 +1001,26 @@ export class Joystick{
     }
     getPosition(event) {
         if(event != null){
-            var mouse_x = event.clientX || event.touches[0].clientX;
-            var mouse_y = event.clientY || event.touches[0].clientY;
+            if(event.clientX != null || event.touches != null){
+                var mouse_x = null;
+                var mouse_y = null;
+                if(event.clientX != null){
+                    mouse_x = event.clientX;
+                    mouse_y = event.clientY;
+                    this.coord.x = mouse_x - this.canvas.offsetLeft;
+                    this.coord.y = mouse_y - this.canvas.offsetTop;
+                }else{
+                    let allowed = false
+                    for(let i = 0; i < event.touches.length && !allowed; i++){
+                        mouse_x = event.clientX || event.touches[0].clientX;
+                        mouse_y = event.clientY || event.touches[0].clientY;
+                        this.coord.x = mouse_x - this.canvas.offsetLeft;
+                        this.coord.y = mouse_y - this.canvas.offsetTop;
+                        allowed = this.isPosAcceptable()
+                    }
+                }
+            }
 
-            this.coord.x = mouse_x - this.canvas.offsetLeft;
-            this.coord.y = mouse_y - this.canvas.offsetTop;
         }
     }
     is_it_in_the_base_circle() {
@@ -1016,7 +1031,9 @@ export class Joystick{
     startDrawing(event) {
         this.paint = true;
         this.getPosition(event);
-        this.validTouch = this.isPosAcceptable();
+        if(!this.validTouch){
+            this.validTouch = this.isPosAcceptable();
+        }
         if(this.validTouch){
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.background();
@@ -1033,16 +1050,25 @@ export class Joystick{
         return Math.sqrt(Math.pow(xTmp,2)+Math.pow(yTmp,2)) <= this.initialInteractionRadius;
 
     }
-    stopDrawing() {
-        this.paint = false;
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.background();
-        this.joystick(this.x_orig, this.y_orig);
+    stopDrawing(event) {
+        if(event.touches == null || event.touches.length === 0){
+            this.validTouch = false;
+        }else {
+            this.getPosition(event);
+            this.validTouch = this.isPosAcceptable();
+        }
 
-        this.angle_in_degrees = 0;
-        this.speed =  0;
-        this.x_relative = 0;
-        this.y_relative = 0;
+        if(!this.validTouch){
+            this.paint = false;
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.background();
+            this.joystick(this.x_orig, this.y_orig);
+
+            this.angle_in_degrees = 0;
+            this.speed =  0;
+            this.x_relative = 0;
+            this.y_relative = 0;
+        }
 
     }
     Draw(event) {
