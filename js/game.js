@@ -87,10 +87,7 @@ if(h > w){
     joystickSize = w*JOYSTICK_SIZE_PERCENTAGE/100/2;
     if((h-canvasWidthPx)*80/100 < joystickSize){
         joystickSize = (h-canvasWidthPx)*80/100;
-    }
-    //console.log(divMid.getBoundingClientRect().height)
-    //console.log(canvas.getBoundingClientRect().height)
-    //console.log(divTmp.getBoundingClientRect().height)
+    }//joystick size
     joystickDiv.style.margin = (divMid.getBoundingClientRect().height-20-joystickSize-canvasWidthPx-divTmp.getBoundingClientRect().height)+"px auto 0px 0px";
 }else {
     if(h > w*60/100){
@@ -107,7 +104,8 @@ if(h > w){
     divLeft.appendChild(joystickDiv)
 
     joystickSize = divLeft.getBoundingClientRect().width*JOYSTICK_SIZE_PERCENTAGE/100;
-    joystickDiv.style.margin = (divMid.getBoundingClientRect().height*95/100-joystickSize)+"px auto 0% auto";
+    console.log(h+"   "+joystickSize)
+    joystickDiv.style.margin = (h*90/100-joystickSize)+"px auto 0% auto";
 }//build the screen
 outOfScreenDiv.style.top = canvasWidthPx/3+"px"
 if(h > w){

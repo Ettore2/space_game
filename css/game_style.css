@@ -25,7 +25,7 @@ p{
 }
 #game_canvas_div{
     display: flex;
-    margin: auto;
+    margin: 0 auto auto auto;
     padding: 0;
     width: fit-content;
 }
