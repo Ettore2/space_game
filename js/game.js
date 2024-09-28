@@ -64,7 +64,12 @@ let joystickSize
 
 divMid.appendChild(outOfScreenDiv)
 if(h > w){
-    canvasWidthPx = w;
+    if(h-w >= h*20/100){
+        canvasWidthPx = w;
+    }else{
+        canvasWidthPx = h - h*20/100
+    }
+
     divMid.style.width = "100%";
     divMid.style.height = h+"px";
     divMid.style.display = "block";
@@ -80,8 +85,8 @@ if(h > w){
     divMid.appendChild(joystickDiv)
 
     joystickSize = w*JOYSTICK_SIZE_PERCENTAGE/100/2;
-    if((h-w)*80/100 < joystickSize){
-        joystickSize = (h-w)*80/100;
+    if((h-canvasWidthPx)*80/100 < joystickSize){
+        joystickSize = (h-canvasWidthPx)*80/100;
     }
     //console.log(divMid.getBoundingClientRect().height)
     //console.log(canvas.getBoundingClientRect().height)

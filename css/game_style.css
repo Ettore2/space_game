@@ -23,6 +23,12 @@ p{
     margin: auto;
     padding: 0;
 }
+#game_canvas_div{
+    display: flex;
+    margin: auto;
+    padding: 0;
+    width: fit-content;
+}
 .out_of_screen_text{
     width: 100%;
     margin: 10% auto;
