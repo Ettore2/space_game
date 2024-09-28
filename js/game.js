@@ -62,6 +62,7 @@ joystickDiv.style.padding="2%";
 let canvasWidthPx
 let joystickSize
 
+divMid.appendChild(outOfScreenDiv)
 if(h > w){
     canvasWidthPx = w;
     divMid.style.width = "100%";
@@ -79,10 +80,13 @@ if(h > w){
     divMid.appendChild(joystickDiv)
 
     joystickSize = w*JOYSTICK_SIZE_PERCENTAGE/100/2;
+    if((h-w)*80/100 < joystickSize){
+        joystickSize = (h-w)*80/100;
+    }
     //console.log(divMid.getBoundingClientRect().height)
     //console.log(canvas.getBoundingClientRect().height)
     //console.log(divTmp.getBoundingClientRect().height)
-    joystickDiv.style.margin = (divMid.getBoundingClientRect().height*95/100-joystickSize-canvasWidthPx-divTmp.getBoundingClientRect().height)+"px auto 0px 0px";
+    joystickDiv.style.margin = (divMid.getBoundingClientRect().height-20-joystickSize-canvasWidthPx-divTmp.getBoundingClientRect().height)+"px auto 0px 0px";
 }else {
     if(h > w*60/100){
         canvasWidthPx = w*DIV_MID_WIDTH_PERCENTAGE/100;
@@ -96,7 +100,6 @@ if(h > w){
     divRight.appendChild(pointsDiv)
     divLeft.appendChild(healthDiv)
     divLeft.appendChild(joystickDiv)
-    divMid.appendChild(outOfScreenDiv)
 
     joystickSize = divLeft.getBoundingClientRect().width*JOYSTICK_SIZE_PERCENTAGE/100;
     joystickDiv.style.margin = (divMid.getBoundingClientRect().height*95/100-joystickSize)+"px auto 0% auto";
@@ -106,7 +109,7 @@ if(h > w){
     outOfScreenDiv.style.left = (canvasWidthPx - canvasWidthPx*OUT_OF_SCREEN_DIV_WIDTH_PERCENTAGE/100)/2+"px"
 }else {
     outOfScreenDiv.style.left = (w*DIV_LEFT_WIDTH_PERCENTAGE/100+(canvasWidthPx - canvasWidthPx*OUT_OF_SCREEN_DIV_WIDTH_PERCENTAGE/100)/2)+"px"
-}//set game canvas size
+}//set out of screen text pos
 canvas.style.height = canvasWidthPx+"px"
 canvas.style.width = canvasWidthPx+"px"
 
@@ -137,12 +140,16 @@ let intervalId = setInterval(function() {
         game.player.setInput(GameObject.DIR_RIGHT);
     }
 
+    /*
     if(joystick.speed > 0){
         //console.log(joystick.angle_in_degrees);
-        console.log(joystick.angle_in_degrees +"     "+ game.player.rot)
+        //console.log(joystick.angle_in_degrees +"     "+ game.player.rot)
         //console.log(Math.abs(joystick.angle_in_degrees - game.player.rot) +"     "+ game.player.stats.rotSpeed*2)
         //console.log("------------------------------------")
     }
+
+     */
+
     if(Math.abs(joystick.angle_in_degrees - game.player.rot) > game.player.stats.rotSpeed*2.5 && joystick.speed > 0){
         if((joystick.angle_in_degrees +360 - game.player.rot)%360 > 180){
             game.player.setInput(GameObject.DIR_RIGHT);
