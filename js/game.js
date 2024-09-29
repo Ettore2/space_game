@@ -14,6 +14,7 @@ let OUT_OF_SCREEN_DIV_WIDTH_PERCENTAGE = 20;
 let DIV_MID_WIDTH_PERCENTAGE = 60;
 let DIV_LEFT_WIDTH_PERCENTAGE = (100 - DIV_MID_WIDTH_PERCENTAGE)/2;
 let JOYSTICK_SIZE_PERCENTAGE = 100;
+let ACTION_A_BTN_SIZE_PERCENTAGE = 60;
 
 let divLeft = document.getElementById("div_left")
 let divMid = document.getElementById("div_mid")
@@ -59,6 +60,16 @@ joystickDiv.style.width ="fit-content"
 joystickDiv.style.height ="fit-content"
 joystickDiv.style.padding="2%";
 
+let actionABtn = document.createElement("button");
+actionABtn.id = "action_a_btn";
+actionABtn.type = "button"
+actionABtn.addEventListener("mousedown", actionAEmulatorStart)
+actionABtn.addEventListener("touchstart", actionAEmulatorStart)
+actionABtn.addEventListener("mouseup", actionAEmulatorEnd)
+actionABtn.addEventListener("mouseleave", actionAEmulatorEnd)
+actionABtn.addEventListener("touchcancel", actionAEmulatorEnd)
+actionABtn.addEventListener("touchend", actionAEmulatorEnd)
+
 let canvasWidthPx
 let joystickSize
 
@@ -75,20 +86,26 @@ if(h > w){
     divMid.style.display = "block";
     divLeft.style.display = "none";
     divRight.style.display = "none";
-    let divTmp = document.createElement("div");
+    let divTmp = document.createElement("div");//div for points and health
     divTmp.style.display = "flex"
     divTmp.appendChild(healthDiv)
     divTmp.appendChild(pointsDiv)
-
-
     divMid.appendChild(divTmp)
-    divMid.appendChild(joystickDiv)
+
+    divTmp = document.createElement("div");//div for buttons
+    divTmp.style.marginTop="auto";
+    divTmp.style.marginBottom="0px";
+    divTmp.style.display="flex";
+    divMid.appendChild(divTmp)
+    divTmp.appendChild(joystickDiv)
+    divTmp.appendChild(actionABtn)
 
     joystickSize = w*JOYSTICK_SIZE_PERCENTAGE/100/2;
     if((h-canvasWidthPx)*80/100 < joystickSize){
         joystickSize = (h-canvasWidthPx)*80/100;
     }//joystick size
-    joystickDiv.style.margin = (divMid.getBoundingClientRect().height-20-joystickSize-canvasWidthPx-divTmp.getBoundingClientRect().height)+"px auto 0px 0px";
+    actionABtn.style.width = joystickSize*ACTION_A_BTN_SIZE_PERCENTAGE/100+"px";
+    joystickDiv.style.margin = "0px auto 0px 0px";
 }else {
     if(h > w*60/100){
         canvasWidthPx = w*DIV_MID_WIDTH_PERCENTAGE/100;
@@ -102,10 +119,12 @@ if(h > w){
     divRight.appendChild(pointsDiv)
     divLeft.appendChild(healthDiv)
     divLeft.appendChild(joystickDiv)
+    divRight.appendChild(actionABtn)
 
     joystickSize = divLeft.getBoundingClientRect().width*JOYSTICK_SIZE_PERCENTAGE/100;
-    console.log(h+"   "+joystickSize)
     joystickDiv.style.margin = (h*90/100-joystickSize)+"px auto 0% auto";
+    actionABtn.style.margin = (h*85/100-joystickSize*ACTION_A_BTN_SIZE_PERCENTAGE/100)+"px auto 0% 30%";
+    actionABtn.style.width = joystickSize*ACTION_A_BTN_SIZE_PERCENTAGE/100+"px";
 }//build the screen
 outOfScreenDiv.style.top = canvasWidthPx/3+"px"
 if(h > w){
@@ -217,3 +236,14 @@ document.addEventListener("keyup", function(e){
     }
 
 });
+
+function actionAEmulatorStart(){
+    actionAFlag = true;
+    actionABtn.style.boxShadow="0 1px #9a0000"
+    actionABtn.style.translate="0 4px"
+}
+function actionAEmulatorEnd(){
+    actionAFlag = false;
+    actionABtn.style.boxShadow="0 5px #9a0000"
+    actionABtn.style.translate="0 0"
+}
