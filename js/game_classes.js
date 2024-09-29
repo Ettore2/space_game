@@ -109,7 +109,7 @@ export class GameInstance {
                 //console.log(this.managedObjs);
                 //console.log("toAddObj: "+this.toAddObj.length);
 
-                //this.gameMode.loop(this.delay);
+                this.gameMode.loop(this.delay);
 
                 for(let i = this.managedObjs.length-1; i >= 0; i--){
                     this.managedObjs[i].logicUpdate(this.delay);
