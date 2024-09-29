@@ -1020,6 +1020,8 @@ export class Joystick{
                     this.coord.y = mouse_y - this.canvas.offsetTop;
                 }else{
                     let allowed = false
+                    this.coord.x = this.x_orig;
+                    this.coord.y = this.y_orig;
                     for(let i = 0; i < event.touches.length && !allowed; i++){
                         mouse_x = event.clientX || event.touches[i].clientX;
                         mouse_y = event.clientY || event.touches[i].clientY;
@@ -1058,7 +1060,8 @@ export class Joystick{
     }
     stopDrawing(event) {
         this.getPosition(event);
-        if(!this.isPosAcceptable() || event.clientX !== null){
+
+        if(!this.isPosAcceptable() || event.clientX != null){
             this.paint = false;
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.background();
@@ -1068,6 +1071,8 @@ export class Joystick{
             this.speed =  0;
             this.x_relative = 0;
             this.y_relative = 0;
+        }else {
+            this.Draw()
         }
 
     }
