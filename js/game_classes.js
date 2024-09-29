@@ -1021,8 +1021,8 @@ export class Joystick{
                 }else{
                     let allowed = false
                     for(let i = 0; i < event.touches.length && !allowed; i++){
-                        mouse_x = event.clientX || event.touches[0].clientX;
-                        mouse_y = event.clientY || event.touches[0].clientY;
+                        mouse_x = event.clientX || event.touches[i].clientX;
+                        mouse_y = event.clientY || event.touches[i].clientY;
                         this.coord.x = mouse_x - this.canvas.offsetLeft;
                         this.coord.y = mouse_y - this.canvas.offsetTop;
                         allowed = this.isPosAcceptable()
