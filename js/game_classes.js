@@ -758,7 +758,7 @@ export class Bullet extends GameObject{
         this.image = this.getImgFromPool(type)
         this.stats = Bullet.statsRegistry[type];
         this.velX = Math.cos(degreesToRads(rot))*this.stats.startSpeed
-        this.velY = Math.sin(degreesToRads(rot))*this.stats.startSpeed
+        this.velY = -Math.sin(degreesToRads(rot))*this.stats.startSpeed
         this.timerLife = 0;
         this.availableHits = 1 + this.stats.piercing;
         this.collRange = this.stats.collider;
@@ -772,11 +772,12 @@ export class Bullet extends GameObject{
         //acceleration
         let rotRad = degreesToRads(this.rot);
         this.velX += Math.cos(rotRad)*(this.stats.acc-this.stats.dec)
-        this.velX += Math.sin(rotRad)*(this.stats.acc-this.stats.dec)
-        //check for max velocity
+        this.velY -= Math.sin(rotRad)*(this.stats.acc-this.stats.dec)
+        //check max velocity
         if(Math.pow(this.velX,2)+Math.pow(this.velY,2) > Math.pow(this.stats.maxSpeed,2)){
-            this.velX = Math.cos(rotRad)*this.stats.maxSpeed
-            this.velY = Math.sin(rotRad)*this.stats.maxSpeed
+            let rTmp = getVectRad(this.velX,this.velY);
+            this.velX = Math.cos(rTmp)*this.stats.maxSpeed
+            this.velY = Math.sin(rTmp)*this.stats.maxSpeed
         }
         super.logicUpdate(deltaT);
 
