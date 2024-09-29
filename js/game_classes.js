@@ -958,6 +958,7 @@ export class Joystick{
         this.x_orig = this.canvas.width / 2;
         this.y_orig = this.canvas.height / 2;
         this.coord = { x: 0, y: 0 };//pos relative to canvas up right
+        this.paint = false;
         this.resize();
 
         //output things
@@ -1057,7 +1058,7 @@ export class Joystick{
     }
     stopDrawing(event) {
         this.getPosition(event);
-        if(!this.isPosAcceptable()){
+        if(!this.isPosAcceptable() || event.clientX !== null){
             this.paint = false;
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             this.background();
@@ -1071,45 +1072,47 @@ export class Joystick{
 
     }
     Draw(event) {
-        this.getPosition(event);
-        if(!this.isPosAcceptable()){
-            this.coord.x = this.x_orig;
-            this.coord.y = this.y_orig;
+        if(this.paint){
+            this.getPosition(event);
+            if(!this.isPosAcceptable()){
+                this.coord.x = this.x_orig;
+                this.coord.y = this.y_orig;
+            }
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.background();
+            var x, y;
+            var angle = Math.atan2((this.coord.y - this.y_orig), (this.coord.x - this.x_orig));
+
+            if (Math.sign(angle) == -1) {
+                this.angle_in_degrees = Math.round(- angle * 180 / Math.PI);
+            }
+            else {
+                this.angle_in_degrees = Math.round( 360 - angle * 180 / Math.PI);
+            }
+
+            //console.log((this.angle_in_degrees+this.rotationOffset)%360)
+            //this.angle_in_degrees = (this.angle_in_degrees+this.rotationOffset)%360;
+            //console.log("ww")
+
+
+            if (this.is_it_in_the_base_circle()) {
+                this.joystick(this.coord.x, this.coord.y);
+                x = this.coord.x;
+                y = this.coord.y;
+            }
+            else {
+                x = this.baseRadius * Math.cos(angle) + this.x_orig;
+                y = this.baseRadius * Math.sin(angle) + this.y_orig;
+                this.joystick(x, y);
+            }
+
+
+
+            this.speed =  Math.round(100 * Math.sqrt(Math.pow(x - this.x_orig, 2) + Math.pow(y - this.y_orig, 2)) / this.baseRadius);
+
+            this.x_relative = Math.round(x - this.x_orig);
+            this.y_relative = Math.round(y - this.y_orig);
         }
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.background();
-        var x, y;
-        var angle = Math.atan2((this.coord.y - this.y_orig), (this.coord.x - this.x_orig));
-
-        if (Math.sign(angle) == -1) {
-            this.angle_in_degrees = Math.round(- angle * 180 / Math.PI);
-        }
-        else {
-            this.angle_in_degrees = Math.round( 360 - angle * 180 / Math.PI);
-        }
-
-        //console.log((this.angle_in_degrees+this.rotationOffset)%360)
-        //this.angle_in_degrees = (this.angle_in_degrees+this.rotationOffset)%360;
-        //console.log("ww")
-
-
-        if (this.is_it_in_the_base_circle()) {
-            this.joystick(this.coord.x, this.coord.y);
-            x = this.coord.x;
-            y = this.coord.y;
-        }
-        else {
-            x = this.baseRadius * Math.cos(angle) + this.x_orig;
-            y = this.baseRadius * Math.sin(angle) + this.y_orig;
-            this.joystick(x, y);
-        }
-
-
-
-        this.speed =  Math.round(100 * Math.sqrt(Math.pow(x - this.x_orig, 2) + Math.pow(y - this.y_orig, 2)) / this.baseRadius);
-
-        this.x_relative = Math.round(x - this.x_orig);
-        this.y_relative = Math.round(y - this.y_orig);
 
 
     }
