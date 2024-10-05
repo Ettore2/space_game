@@ -75,7 +75,7 @@ export class GameInstance {
 
 
         this.player = new Player(playerTypeId,GameInstance.PIXELS_NUMBER/2,GameInstance.PIXELS_NUMBER/2,this);
-        this.elements.healthImg.src = this.player.image.src;
+        this.elements.healthImg.src = IMGS_DIR+this.player.stats.icon;
         this.managedObjs.push(this.player);
         this.elements.healthText.innerText = this.player.health+"";
         //this.managedObjs.push(AsteroidBlueprint.createAsteroid(0,0,200,200,this));
@@ -356,7 +356,7 @@ export class AsteroidBlueprint extends GameObject{
                 children : 0,
                 health : 2,
                 name : "asteroid health small",
-                images : ["asteroid_heart_small_1.png"],
+                images : ["asteroid_heart_small_2.png"],
                 collider : 30,
                 min_spawn_speed : 5,
                 max_spawn_speed : 10,
@@ -537,6 +537,7 @@ export class Player extends GameObject{
         {
             name: "default",
             img: "player_0.png",
+            icon: "player_0_icon.png",
             maxHealth: 3,
             collider: 20,
             acc: 0.6,
@@ -686,6 +687,12 @@ export class Player extends GameObject{
             this.game.elements.healthText.innerText = this.health+"";
         }
     }
+    graphicUpdate(deltaT) {
+        if(this.alive){
+            super.graphicUpdate(deltaT);
+        }
+
+    }
 
     setInput(inputId){
         switch (inputId){
@@ -816,7 +823,7 @@ export class HealthAsteroid extends AsteroidBlueprint{
     }
 }
 export class GameMode{
-    static TOTAL_GAME_MODES = 1;
+    static TOTAL_GAME_MODES = 2;
 
     /**
      @param {String} name
@@ -851,6 +858,7 @@ export class GameMode{
     static getGameMode(gameModeId,game){
         switch (gameModeId){
             case 0: return new GameModeDestroyAsteroids(game);
+            case 1: return new GameModeTimeTrial(game);
             default: return null;
         }
     }
@@ -929,6 +937,23 @@ export class GameModeDestroyAsteroids extends GameMode{
      */
     loop(deltaT){
         super.loop(deltaT);
+    }
+
+}
+export class GameModeTimeTrial extends GameMode{
+    /**
+     @param {GameInstance} game
+     */
+    constructor(game) {
+        super("time trial","clock_icon.png",game);
+        this.getPointsFromASteroids = false;
+    }
+    /**
+     @param {int} deltaT
+     */
+    loop(deltaT){
+        super.loop(deltaT);
+        this.increasePoints(1)
     }
 
 }

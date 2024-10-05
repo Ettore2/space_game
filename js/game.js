@@ -30,7 +30,6 @@ pointsDiv.classList.add("icon_div");
 let pointsText = document.createElement("p");
 let pointsImg = document.createElement("img");
 pointsImg.classList.add("icon");
-pointsImg.classList.add("rotate270");
 pointsImg.classList.add("margin_right");
 pointsText.classList.add("margin_left");
 pointsDiv.appendChild(pointsText)
@@ -41,7 +40,6 @@ healthDiv.classList.add("icon_div");
 let healthText = document.createElement("p");
 let healthImg = document.createElement("img");
 healthImg.classList.add("icon");
-healthImg.classList.add("rotate270");
 healthImg.classList.add("margin_left");
 healthText.classList.add("margin_right");
 healthDiv.appendChild(healthImg)
