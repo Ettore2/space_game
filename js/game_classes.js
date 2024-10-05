@@ -211,8 +211,7 @@ export class GameObject {
         this.isEnemy = false;
         this.timerInvincibility = 0;
         this.invincibilityTime = 0;
-        this.timerHitBlinck = 0;
-        this.hitBlinckTime = 80;
+        this.blinkTime = 100;
 
         this.alive = true;
         this.velX = 0;
@@ -239,7 +238,6 @@ export class GameObject {
     }
     takeDamage(dmg){
         if(this.timerInvincibility <= 0 && dmg > 0){
-            this.timerHitBlinck = this.hitBlinckTime;
             this.timerInvincibility = this.invincibilityTime;
             this.health -= dmg;
             if(this.health < 0){
@@ -274,9 +272,6 @@ export class GameObject {
         if(this.timerInvincibility > 0){
             this.timerInvincibility -= deltaT;
         }
-        if(this.timerHitBlinck > 0){
-            this.timerHitBlinck -= deltaT;
-        }
 
     }//"initialize" tho obj at the start of a frame
     /**
@@ -299,8 +294,12 @@ export class GameObject {
      @param {int} deltaT
      */
     graphicUpdate(deltaT) {
-        if(this.timerHitBlinck <= 0){
+        if(this.timerInvincibility <= 0){
             drawImage(this.game,this.image,this.posX,this.posY,this.rot);
+        }else{
+            if((Math.floor(this.timerInvincibility/this.blinkTime))%2 === 1){
+                drawImage(this.game,this.image,this.posX,this.posY,this.rot);
+            }
         }
     }//draw the obj on canvas
 }
@@ -381,6 +380,7 @@ export class AsteroidBlueprint extends GameObject{
         this.stats = Asteroid.stats[type][size];
         this.image = this.getImgFromPool();
         this.velRot = this.getNewRotVel()
+        this.invincibilityTime = this.blinkTime;
 
         let v = this.getNewSpeed()
         this.velX = v['x'];
@@ -670,9 +670,6 @@ export class Player extends GameObject{
         this.inputRight = false;
         this.inputActA = false;
 
-    }
-    graphicUpdate(deltaT) {
-        super.graphicUpdate(deltaT);
     }
     heal(amount){
         if(this.alive){
