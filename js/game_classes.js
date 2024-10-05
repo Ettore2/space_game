@@ -547,6 +547,20 @@ export class Player extends GameObject{
             rotSpeed: 4,
             bulletType: 0,
             invincibilityTime: 1300
+        },
+        {
+            name: "zoomer",
+            img: "player_1.png",
+            icon: "player_1_icon.png",
+            maxHealth: 3,
+            collider: 20,
+            acc: 0.9,
+            dec: 0.04,
+            maxSpeed: 24,
+            actADelay: 260,
+            rotSpeed: 7,
+            bulletType: 1,
+            invincibilityTime: 1300
         }
     ];
 
@@ -738,19 +752,32 @@ export class Player extends GameObject{
 }
 export class Bullet extends GameObject{
     static statsRegistry = [
-    {
-        name: "default",
-        img: "player_0_bullet.png",
-        collider: 4,
-        dmg: 2,
-        lifeTime: 3000,
-        acc: 0,
-        dec: 0,
-        startSpeed: 20,
-        maxSpeed: 20,
-        piercing: 0
+        {
+            name: "default",
+            img: "player_0_bullet.png",
+            collider: 4,
+            dmg: 2,
+            lifeTime: 3000,
+            acc: 0,
+            dec: 0,
+            startSpeed: 20,
+            maxSpeed: 20,
+            piercing: 0
 
-    }
+        },
+        {
+            name: "default_weak",
+            img: "player_0_bullet.png",
+            collider: 4,
+            dmg: 1,
+            lifeTime: 3000,
+            acc: 0,
+            dec: 0,
+            startSpeed: 20,
+            maxSpeed: 20,
+            piercing: 0
+
+        }
 ];
     static TAG = "bullet";
     constructor(type, x, y, rot, game) {
