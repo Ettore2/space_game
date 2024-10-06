@@ -437,10 +437,11 @@ export class AsteroidBlueprint extends GameObject{
                     let v = this.getNewSpeed();
                     let objTmp = new Asteroid(
                         this.size-1,
-                        this.posX+Math.cos(this.rot+i*360/this.stats.children)*this.stats.children,
-                        this.posY+Math.sin(this.rot+i*360/this.stats.children)*this.stats.children,
+                        this.posX+Math.cos(this.rot+i*360/this.stats.children),
+                        this.posY+Math.sin(this.rot+i*360/this.stats.children),
                         this.game
                     );
+                    //objTmp.timerInvincibility = objTmp.invincibilityTime;
                     this.game.managedObjs.push(objTmp);
                 }
             }
@@ -560,6 +561,34 @@ export class Player extends GameObject{
             actADelay: 260,
             rotSpeed: 7,
             bulletType: 1,
+            invincibilityTime: 1300
+        },
+        {
+            name: "sniper",
+            img: "player_2.png",
+            icon: "player_2_icon.png",
+            maxHealth: 3,
+            collider: 20,
+            acc: 0.9,
+            dec: 0.07,
+            maxSpeed: 16,
+            actADelay: 530,
+            rotSpeed: 4,
+            bulletType: 2,
+            invincibilityTime: 1300
+        },
+        {
+            name: "blobber",
+            img: "player_3.png",
+            icon: "player_3_icon.png",
+            maxHealth: 3,
+            collider: 20,
+            acc: 0.3,
+            dec: 0.06,
+            maxSpeed: 26,
+            actADelay: 190,
+            rotSpeed: 5,
+            bulletType: 3,
             invincibilityTime: 1300
         }
     ];
@@ -754,7 +783,7 @@ export class Bullet extends GameObject{
     static statsRegistry = [
         {
             name: "default",
-            img: "player_0_bullet.png",
+            img: "bullet_0.png",
             collider: 4,
             dmg: 2,
             lifeTime: 3000,
@@ -767,14 +796,40 @@ export class Bullet extends GameObject{
         },
         {
             name: "default_weak",
-            img: "player_0_bullet.png",
-            collider: 4,
+            img: "bullet_1.png",
+            collider: 3,
             dmg: 1,
             lifeTime: 3000,
             acc: 0,
             dec: 0,
             startSpeed: 20,
             maxSpeed: 20,
+            piercing: 0
+
+        },
+        {
+            name: "default_strong",
+            img: "bullet_2.png",
+            collider: 6,
+            dmg: 4,
+            lifeTime: 3000,
+            acc: 0,
+            dec: 0,
+            startSpeed: 25,
+            maxSpeed: 25,
+            piercing: 1
+
+        },
+        {
+            name: "default_slow",
+            img: "bullet_3.png",
+            collider: 5,
+            dmg: 1,
+            lifeTime: 3000,
+            acc: 0,
+            dec: 0.5,
+            startSpeed: 17,
+            maxSpeed: 17,
             piercing: 0
 
         }
@@ -793,6 +848,7 @@ export class Bullet extends GameObject{
         this.timerLife = 0;
         this.availableHits = 1 + this.stats.piercing;
         this.collRange = this.stats.collider;
+        this.hittedObjs = [];
     }
     getImgFromPool(type){
         let img = new Image();
@@ -800,10 +856,37 @@ export class Bullet extends GameObject{
         return img;
     }
     logicUpdate(deltaT) {
+        //deceleration
+        let rTmp = getVectRad(this.velX,this.velY);
+        if(this.velX > 0){
+            this.velX -= Math.cos(rTmp)*this.stats.dec;
+            if(this.velX < 0){
+                this.velX = 0;
+            }
+        }
+        if(this.velX < 0){
+            this.velX -= Math.cos(rTmp)*this.stats.dec;
+            if(this.velX > 0){
+                this.velX = 0;
+            }
+        }
+        if(this.velY > 0){
+            this.velY -= Math.sin(rTmp)*this.stats.dec;
+            if(this.velY < 0){
+                this.velY = 0;
+            }
+        }
+        if(this.velY < 0){
+            this.velY -= Math.sin(rTmp)*this.stats.dec;
+            if(this.velY > 0){
+                this.velY = 0;
+            }
+        }
+
         //acceleration
         let rotRad = degreesToRads(this.rot);
-        this.velX += Math.cos(rotRad)*(this.stats.acc-this.stats.dec)
-        this.velY -= Math.sin(rotRad)*(this.stats.acc-this.stats.dec)
+        this.velX += Math.cos(rotRad)*(this.stats.acc)
+        this.velY -= Math.sin(rotRad)*(this.stats.acc)
         //check max velocity
         if(Math.pow(this.velX,2)+Math.pow(this.velY,2) > Math.pow(this.stats.maxSpeed,2)){
             let rTmp = getVectRad(this.velX,this.velY);
@@ -821,7 +904,8 @@ export class Bullet extends GameObject{
         super.collisionsResolve(deltaT);
 
         for(let i = 0; i < this.registeredCollisions.length && this.availableHits > 0; i++){
-            if(this.registeredCollisions[i].isEnemy){
+            if(this.registeredCollisions[i].isEnemy && !this.hittedObjs.includes(this.registeredCollisions[i])){
+                this.hittedObjs.push(this.registeredCollisions[i]);
                 this.availableHits--;
                 this.registeredCollisions[i].takeDamage(this.stats.dmg);
 

@@ -143,7 +143,7 @@ let elements = {
     outOfScreenText : outOfScreenText,
 
 }
-let game = new GameInstance(canvas,FRAMES_DELAY,0,0,elements);
+let game = new GameInstance(canvas,FRAMES_DELAY,3,0,elements);
 let joystick = new Joystick(joystickCanvas,joystickSize,joystickSize,joystickSize*30/100,joystickSize*14/100,joystickSize*2/100,joystickSize*70/100);
 joystick.setRotationOffset(0);
 Joystick.initializeListeners(joystick);
