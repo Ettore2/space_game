@@ -1,0 +1,36 @@
+body{
+    background-color: #100225;
+}
+
+#div_question_mark_icon{
+    display: flex;
+}
+#question_mark_icon{
+    width: 4vw;
+    aspect-ratio: 1;
+    margin: 1vw 1vw 1vw auto;
+    border-radius: 8px;
+    border: 4px solid aliceblue;
+
+    user-drag: none;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+#question_mark_icon:hover{
+    background-color: rgba(255, 255, 255, 0.18);
+}
+#div_character_selection{
+    width: fit-content;
+    margin: 2vw auto 0 auto;
+}
+
+.playable_ship_icon{
+    width: 10vw;
+    margin: 1vw;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    border: 4px solid rgba(0, 0, 0, 0);
+}

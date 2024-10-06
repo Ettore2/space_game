@@ -1,13 +1,6 @@
 
 body{
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: fit-content;
-    background-color: dimgrey;
-    overflow: hidden;
     display: flex;
-    overscroll-behavior-y: contain;
 }
 p{
     font-size: 6vw;
@@ -71,13 +64,6 @@ p{
     -webkit-user-select: none;
     -ms-user-select: none;
 }
-.rotate270 {
-     -webkit-transform: rotate(270deg);
-     -moz-transform: rotate(270deg);
-     -o-transform: rotate(270deg);
-     -ms-transform: rotate(270deg);
-     transform: rotate(270deg);
- }
 .margin_right{
     margin: auto auto auto 0;
 }

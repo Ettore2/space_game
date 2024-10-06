@@ -1,0 +1,17 @@
+
+body{
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: fit-content;
+    background-color: dimgrey;
+    overflow: hidden;
+    overscroll-behavior-y: contain;
+}
+.rotate270 {
+    -webkit-transform: rotate(270deg);
+    -moz-transform: rotate(270deg);
+    -o-transform: rotate(270deg);
+    -ms-transform: rotate(270deg);
+    transform: rotate(270deg);
+}
