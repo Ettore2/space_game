@@ -945,7 +945,9 @@ export class GameMode{
         this.objectiveImg = IMGS_DIR + objectiveImg;
         this.name = name;
         this.game = game;
-        this.game.elements.pointsImg.src = this.objectiveImg;
+        if(game != null){
+            this.game.elements.pointsImg.src = this.objectiveImg;
+        }
 
 
         this.spawnAsteroids = true;
@@ -956,7 +958,9 @@ export class GameMode{
             [100]
         ];
         this.points = 0;
-        this.game.elements.pointsText.innerText = this.points;
+        if(game != null){
+            this.game.elements.pointsText.innerText = this.points;
+        }
         this.maxAsteroids = 20;
         this.currAsteroids = 0
         this.asteroidsSpawnTime = 800;
@@ -972,6 +976,13 @@ export class GameMode{
             case 1: return new GameModeTimeTrial(game);
             default: return null;
         }
+    }
+    static getAllGameModes(game){
+        let result = [];
+        for(let i = 0; i < this.TOTAL_GAME_MODES; i++){
+            result.push(GameMode.getGameMode(i,game));
+        }
+        return result;
     }
     /**
      @param {int} deltaT

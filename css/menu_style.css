@@ -1,9 +1,26 @@
 body{
     background-color: #100225;
 }
+p{
+    font-size: 6vw;
+    text-size-adjust: auto;
+    text-align: center;
+    font-family: "VT323", monospace;
+
+    margin: 0 0 0 0;
+    color: white;
+
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
 
 #div_question_mark_icon{
     display: flex;
+    position:absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
 }
 #question_mark_icon{
     width: 4vw;
@@ -22,15 +39,32 @@ body{
 #question_mark_icon:hover{
     background-color: rgba(255, 255, 255, 0.18);
 }
+#div_main{
+    width: 100%;
+}
 #div_character_selection{
     width: fit-content;
-    margin: 2vw auto 0 auto;
+    margin: 0 auto 1vw auto;
+}
+#div_game_mode_selection{
+    width: fit-content;
+    margin: 0 auto 1vw auto;
 }
 
 .playable_ship_icon{
     width: 10vw;
-    margin: 1vw;
+    margin: 0 1vw 0 1vw;
     aspect-ratio: 1;
     border-radius: 8px;
     border: 4px solid rgba(0, 0, 0, 0);
+}
+.playable_game_mode_icon{
+    width: 10vw;
+    margin: 0 1vw 0 1vw;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    border: 4px solid rgba(0, 0, 0, 0);
+}
+.div_block_1{
+    margin: 0 auto 0 auto;
 }
