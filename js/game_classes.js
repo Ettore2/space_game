@@ -1,6 +1,6 @@
 const DEFAULT_IMGS_SCALE = 4;
 
-const DEBUG_INVINCIBLE_PLAYER = false;
+const DEBUG_INVINCIBLE_PLAYER = true;
 
 function drawImage2(game,img, x, y, scale, rotation){
     //console.log(game);
@@ -1064,6 +1064,7 @@ export class GameMode{
         this.objectiveImg = IMGS_DIR + objectiveImg;
         this.name = name;
         this.game = game;
+        this.difficultyStep = 1;
         if(game != null){
             this.game.elements.pointsImg.src = this.objectiveImg;
         }
@@ -1107,12 +1108,13 @@ export class GameMode{
      @param {int} deltaT
      */
     loop(deltaT){
+        console.log(this.maxAsteroids+Math.floor(this.points/this.difficultyStep))
         //create new asteroids
         if(this.spawnAsteroids){
             if(this.timerSapwnAsteroids < this.asteroidsSpawnTime){
                 this.timerSapwnAsteroids += deltaT;
             }
-            if(this.timerSapwnAsteroids >= this.asteroidsSpawnTime && this.currAsteroids < this.maxAsteroids){
+            if(this.timerSapwnAsteroids >= this.asteroidsSpawnTime && this.currAsteroids < this.maxAsteroids+Math.floor(this.points/this.difficultyStep)){
                 this.timerSapwnAsteroids -= this.asteroidsSpawnTime;
                 //spawn an asteroid
                 let tmp;
@@ -1132,7 +1134,7 @@ export class GameMode{
                     }
                 }
 
-                //choose the type
+                //choose the size
                 let chosenSize = 0;//= 0 important
                 tmp = 0;//= 0 important
                 for(let i = 0; i < this.asteroidsSizesSpawnRate.length; i++){
@@ -1172,6 +1174,7 @@ export class GameModeDestroyAsteroids extends GameMode{
      */
     constructor(game) {
         super("destroy asteroids","asteroid_mega_1.png",game);
+        this.difficultyStep = 20;
     }
     /**
      @param {int} deltaT
@@ -1187,6 +1190,7 @@ export class GameModeTimeTrial extends GameMode{
      */
     constructor(game) {
         super("time trial","clock_icon.png",game);
+        this.difficultyStep = 400;
         this.getPointsFromASteroids = false;
     }
     /**
