@@ -1,6 +1,23 @@
-import {GameInstance, GameObject, Joystick, Player} from "./game_classes.js";
+import {
+    GameInstance,
+    GameObject,
+    Joystick,
+    Player,
+    SESSION_GAME_MODE_ID,
+    SESSION_SPACESHIP_ID,
+    SESSION_MODIFIERS_IDS, GameMode
+} from "./game_classes.js";
 const FRAMES_DELAY = 20;
 
+//check js session
+if(sessionStorage.getItem(SESSION_GAME_MODE_ID) == null ||
+    sessionStorage.getItem(SESSION_SPACESHIP_ID) == null ||
+    sessionStorage.getItem(SESSION_MODIFIERS_IDS) == null){
+    window.location.href = "./menu.html";
+
+}
+
+//constrols things
 let keyUp = "w";
 let keyLeft = "a";
 let keyRight = "d";
@@ -10,6 +27,7 @@ let leftFlag = false;
 let rightFlag = false;
 let actionAFlag = false;
 
+//screen construction things-------------------------------------------------------
 let OUT_OF_SCREEN_DIV_WIDTH_PERCENTAGE = 20;
 let DIV_MID_WIDTH_PERCENTAGE = 60;
 let DIV_LEFT_WIDTH_PERCENTAGE = (100 - DIV_MID_WIDTH_PERCENTAGE)/2;
@@ -134,6 +152,7 @@ canvas.style.height = canvasWidthPx+"px"
 canvas.style.width = canvasWidthPx+"px"
 
 
+//cage creation things-------------------------------------------------------
 let elements = {
     pointsText : pointsText,
     pointsImg : pointsImg,
@@ -143,7 +162,17 @@ let elements = {
     outOfScreenText : outOfScreenText,
 
 }
-let game = new GameInstance(canvas,FRAMES_DELAY,0,0,elements);
+
+//session elaboration
+let playerId = parseInt(sessionStorage.getItem(SESSION_SPACESHIP_ID));
+let gameModeId = parseInt(sessionStorage.getItem(SESSION_GAME_MODE_ID));
+let modifiers = []
+let vTmp = sessionStorage.getItem(SESSION_MODIFIERS_IDS).split(",");
+for(let i = 0; i < vTmp.length; i++){
+    modifiers.push(parseInt(vTmp[i]));
+}
+
+let game = new GameInstance(canvas,FRAMES_DELAY,playerId,gameModeId,modifiers,elements);
 let joystick = new Joystick(joystickCanvas,joystickSize,joystickSize,joystickSize*30/100,joystickSize*14/100,joystickSize*2/100,joystickSize*70/100);
 joystick.setRotationOffset(0);
 Joystick.initializeListeners(joystick);
@@ -184,9 +213,10 @@ let intervalId = setInterval(function() {
     }
 
     game.doLoop()
-}, FRAMES_DELAY);
+}, FRAMES_DELAY);//framerate
 
 
+//functions-----------------------------------------------------------------
 document.addEventListener("keydown", function(e){
     //console.log("down -"+e.key+"-")
     switch (e.key){

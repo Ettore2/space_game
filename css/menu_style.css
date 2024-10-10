@@ -1,3 +1,21 @@
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+@keyframes fadeOut {
+     from {
+         opacity: 1;
+     }
+     to {
+         opacity: 0;
+     }
+ }
+
+
 body{
     background-color: #100225;
 }
@@ -27,7 +45,7 @@ p{
     aspect-ratio: 1;
     margin: 1vw 1vw 1vw auto;
     border-radius: 8px;
-    border: 4px solid aliceblue;
+    border: 0.4vw solid aliceblue;
 
     user-drag: none;
     -webkit-user-drag: none;
@@ -50,21 +68,62 @@ p{
     width: fit-content;
     margin: 0 auto 1vw auto;
 }
+#div_game_modifiers_selection{
+    width: fit-content;
+    margin: 0 auto 1vw auto;
+}
+#text_modifier_info{
+    text-align: center;
+    font-size: 4vw;
+    opacity: 0;
+}
+#btn_play{
+    margin: 1vw auto auto auto;
+    padding: 1vw 2vw 1vw 2vw;
+    background-color: rgba(0,0,0,0);
+    display: block;
 
+    border-radius: 8px;
+    border: 0.4vw solid aliceblue;
+
+    user-drag: none;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+#btn_play:hover{
+    background-color: rgba(255, 255, 255, 0.18);
+}
+
+.fade_in {
+    animation: fadeIn 2s ease-in-out;
+}
+.fade_out {
+    animation: fadeOut 2s ease-in-out;
+}
+.div_block_1{
+    margin: 0 auto 0 auto;
+}
 .playable_ship_icon{
     width: 10vw;
     margin: 0 1vw 0 1vw;
     aspect-ratio: 1;
     border-radius: 8px;
-    border: 4px solid rgba(0, 0, 0, 0);
+    border: 0.4vw solid rgba(0, 0, 0, 0);
 }
 .playable_game_mode_icon{
     width: 10vw;
     margin: 0 1vw 0 1vw;
     aspect-ratio: 1;
     border-radius: 8px;
-    border: 4px solid rgba(0, 0, 0, 0);
+    border: 0.4vw solid rgba(0, 0, 0, 0);
 }
-.div_block_1{
-    margin: 0 auto 0 auto;
+.playable_game_modifier_icon{
+    width: 6vw;
+    margin: 0 1vw 0 1vw;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    border: 0.4vw solid rgba(0, 0, 0, 0);
 }

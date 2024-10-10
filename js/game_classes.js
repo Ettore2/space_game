@@ -24,7 +24,7 @@ function degreesToRads (deg){
 function radsToDegrees (deg){
     return (deg * 180.0) / Math.PI;
 }
-function arrayRemove(arr, value) {
+export function arrayRemove(arr, value) {
     for(let i = 0; i < arr.length; i++){
         if(arr[i] === value){
             arr.splice(i, 1);
@@ -35,6 +35,10 @@ function arrayRemove(arr, value) {
 }
 
 const IMGS_DIR = "../sprites/";
+export const SESSION_SPACESHIP_ID = "session_spaceship_id"
+export const SESSION_GAME_MODE_ID = "session_game_mode_id"
+export const SESSION_MODIFIERS_IDS = "session_modifiers_ids"
+
 
 
 export class GameInstance {
@@ -45,20 +49,77 @@ export class GameInstance {
     static ASTEROIDS_TURN_AROUND_SPACE = 600;
     static ASTEROIDS_SPAWN_SPACE = GameInstance.ASTEROIDS_TURN_AROUND_SPACE / 2;
 
+    static MOD_ALWAYS_SHOOT = {
+    name: "always shoot",
+    img: "always_shoot_modifier.png"
+};
+    static MOD_CANT_SHOOT = {
+    name: "can't shoot",
+        img: "cant_shoot_modifier.png"
+};
+    static MOD_CANT_STOP = {
+    name: "can't stop",
+        img: "cant_stop_modifier.png"
+};
+    static MOD_FAST_ASTEROIDS = {
+    name: "fast asteroids",
+        img: "fast_asteroids_modifier.png"
+};
+    static MOD_BIG_ASTEROIDS = {
+    name: "big asteroids",
+        img: "big_asteroids_modifier.png"
+};
+    static MOD_STRONG_ASTEROIDS = {
+    name: "strong asteroids",
+        img: "strong_asteroids_modifier.png"
+};
+    static MOD_HO_HEALS = {
+    name: "no heals",
+        img: "no_heals_modifier.png"
+};
+    static MOD_RANDOM_SPACESHIP = {
+    name: "random spaceship",
+        img: "random_ship_modifier.png"
+};
+
+    static MODIFIERS = [
+        this.MOD_ALWAYS_SHOOT,
+        this.MOD_CANT_SHOOT,
+        this.MOD_CANT_STOP,
+        this.MOD_FAST_ASTEROIDS,
+        this.MOD_BIG_ASTEROIDS,
+        this.MOD_STRONG_ASTEROIDS,
+        this.MOD_HO_HEALS,
+        this.MOD_RANDOM_SPACESHIP
+    ]
+
+    static MOD_ALWAYS_SHOOT_ID = this.MODIFIERS.indexOf(this.MOD_ALWAYS_SHOOT);
+    static MOD_CANT_SHOOT_ID = this.MODIFIERS.indexOf(this.MOD_CANT_SHOOT);
+    static MOD_CANT_STOP_ID = this.MODIFIERS.indexOf(this.MOD_CANT_STOP);
+    static MOD_FAST_ASTEROIDS_ID = this.MODIFIERS.indexOf(this.MOD_FAST_ASTEROIDS);
+    static MOD_BIG_ASTEROIDS_ID = this.MODIFIERS.indexOf(this.MOD_BIG_ASTEROIDS);
+    static MOD_STRONG_ASTEROIDS_ID = this.MODIFIERS.indexOf(this.MOD_STRONG_ASTEROIDS);
+    static MOD_HO_HEALS_ID = this.MODIFIERS.indexOf(this.MOD_HO_HEALS);
+    static MOD_RANDOM_SPACESHIP_ID = this.MODIFIERS.indexOf(this.MOD_RANDOM_SPACESHIP);
+
+
 
     /**
      @param {HTMLCanvasElement} canvas
      @param {int} delay
      @param {int} playerTypeId
      @param {int} gameModeId
+     @param {[boolean]} modifiers
      @param {{}} elements
      */
-    constructor(canvas,delay,playerTypeId,gameModeId,elements) {
+    constructor(canvas,delay,playerTypeId,gameModeId,modifiers,elements) {
         this.canvas = canvas;
         this.delay = delay;
         this.elements = elements;
         this.elements.outOfScreenText.innerText=Player.OUTSIDE_THE_SCREEN_TIME+"";
         this.gameMode = GameMode.getGameMode(gameModeId,this);
+        this.activeModifiers = modifiers;
+
 
         this.managedObjs = [];
         this.toAddObj = [];
@@ -532,6 +593,10 @@ export class AsteroidBlueprint extends GameObject{
 export class Player extends GameObject{
     static ACTION_A = "a";
     static TAG = "player";
+    static ID_NORMIE = 0;
+    static ID_ZOOMER = 1;
+    static ID_SNIPER = 2;
+    static ID_BLOPPER = 3;
     static OUTSIDE_THE_SCREEN_TIME = 3000;
 
     static statsRegistry = [
@@ -935,6 +1000,8 @@ export class HealthAsteroid extends AsteroidBlueprint{
 }
 export class GameMode{
     static TOTAL_GAME_MODES = 2;
+    static ID_DESTROY_ASTEROIDS = 0;
+    static ID_TIME_TRAIL = 1;
 
     /**
      @param {String} name
