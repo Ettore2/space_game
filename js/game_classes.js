@@ -1,3 +1,7 @@
+const DEFAULT_IMGS_SCALE = 4;
+
+const DEBUG_INVINCIBLE_PLAYER = false;
+
 function drawImage2(game,img, x, y, scale, rotation){
     //console.log(game);
     //console.log(game.ctx);
@@ -9,7 +13,7 @@ function drawImage2(game,img, x, y, scale, rotation){
     game.ctx.setTransform(1,0,0,1,0,0);
 }
 function drawImage(game,img, x, y, rotation) {
-    drawImage2(game, img, x, y, 4, rotation);
+    drawImage2(game, img, x, y, DEFAULT_IMGS_SCALE, rotation);
 
 }
 function getVectRad(x,y){
@@ -33,6 +37,8 @@ export function arrayRemove(arr, value) {
     }
 
 }
+
+
 
 const IMGS_DIR = "../sprites/";
 export const SESSION_SPACESHIP_ID = "session_spaceship_id"
@@ -99,7 +105,7 @@ export class GameInstance {
     static MOD_FAST_ASTEROIDS_ID = this.MODIFIERS.indexOf(this.MOD_FAST_ASTEROIDS);
     static MOD_BIG_ASTEROIDS_ID = this.MODIFIERS.indexOf(this.MOD_BIG_ASTEROIDS);
     static MOD_STRONG_ASTEROIDS_ID = this.MODIFIERS.indexOf(this.MOD_STRONG_ASTEROIDS);
-    static MOD_HO_HEALS_ID = this.MODIFIERS.indexOf(this.MOD_HO_HEALS);
+    static MOD_NO_HEALS_ID = this.MODIFIERS.indexOf(this.MOD_HO_HEALS);
     static MOD_RANDOM_SPACESHIP_ID = this.MODIFIERS.indexOf(this.MOD_RANDOM_SPACESHIP);
 
 
@@ -119,6 +125,7 @@ export class GameInstance {
         this.elements.outOfScreenText.innerText=Player.OUTSIDE_THE_SCREEN_TIME+"";
         this.gameMode = GameMode.getGameMode(gameModeId,this);
         this.activeModifiers = modifiers;
+        //console.log(this.activeModifiers)
 
 
         this.managedObjs = [];
@@ -134,6 +141,10 @@ export class GameInstance {
 
         this.gameState = GameInstance.STATE_PLAY;
 
+        if(this.activeModifiers.includes(GameInstance.MOD_RANDOM_SPACESHIP_ID)){
+            playerTypeId = Math.floor(Math.random()*(Player.statsRegistry.length));
+            console.log(playerTypeId);
+        }
 
         this.player = new Player(playerTypeId,GameInstance.PIXELS_NUMBER/2,GameInstance.PIXELS_NUMBER/2,this);
         this.elements.healthImg.src = IMGS_DIR+this.player.stats.icon;
@@ -318,6 +329,14 @@ export class GameObject {
             this.rot = 360 + this.rot;
         }
     }
+    applyVelocity(){
+        this.posX += this.velX
+        this.posY += this.velY
+    }
+    drawOnCanvas(){
+        drawImage(this.game,this.image,this.posX,this.posY,this.rot);
+
+    }
 
 
     //updates
@@ -325,8 +344,7 @@ export class GameObject {
      @param {int} deltaT
      */
     logicUpdate(deltaT){
-        this.posX += this.velX
-        this.posY += this.velY
+        this.applyVelocity();
         this.rot += this.velRot;
         this.normalizeRot();
         this.registeredCollisions = [];
@@ -356,10 +374,10 @@ export class GameObject {
      */
     graphicUpdate(deltaT) {
         if(this.timerInvincibility <= 0){
-            drawImage(this.game,this.image,this.posX,this.posY,this.rot);
+            this.drawOnCanvas();
         }else{
             if((Math.floor(this.timerInvincibility/this.blinkTime))%2 === 1){
-                drawImage(this.game,this.image,this.posX,this.posY,this.rot);
+                this.drawOnCanvas();
             }
         }
     }//draw the obj on canvas
@@ -369,6 +387,7 @@ export class AsteroidBlueprint extends GameObject{
     static TYPE_BIG = 1;
     static TYPE_MEGA = 2;
     static TAG = "asteroid";
+    static CANT_SHOOT_MOD_BOUNCE_DBG = 1;
 
     static stats =[
         [
@@ -447,6 +466,13 @@ export class AsteroidBlueprint extends GameObject{
         this.velX = v['x'];
         this.velY = v['y'];
         this.game.gameMode.currAsteroids ++;
+
+        if(this.game.activeModifiers.includes(GameInstance.MOD_BIG_ASTEROIDS_ID)){
+            this.collRange = 2*this.collRange;
+        }
+        if(this.game.activeModifiers.includes(GameInstance.MOD_STRONG_ASTEROIDS_ID)){
+            this.health = 2*this.health;
+        }
     }
     static createAsteroid(type,size, x, y, game){
         let obj_class
@@ -509,9 +535,19 @@ export class AsteroidBlueprint extends GameObject{
 
         }
     }
+    drawOnCanvas() {
+        if(this.game.activeModifiers.includes(GameInstance.MOD_BIG_ASTEROIDS_ID)){
+            drawImage2(this.game,this.image,this.posX,this.posY,DEFAULT_IMGS_SCALE*2,this.rot);
+        }else{
+            drawImage(this.game,this.image,this.posX,this.posY,this.rot);
+        }
+
+    }
+
     logicUpdate(deltaT) {
         let rTmp = getVectRad(this.velX,this.velY);
 
+        //acc
         if(this.stats.acc > 0){
             this.velX += Math.cos(rTmp)*this.stats.acc;
             this.velY += Math.sin(rTmp)*this.stats.acc;
@@ -521,6 +557,7 @@ export class AsteroidBlueprint extends GameObject{
                 this.velY = Math.sin(rTmp)*this.stats.max_speed
             }
         }
+        //dec
         if(this.stats.acc < 0){
             if(this.velX > 0){
                 this.velX += Math.cos(rTmp)*this.stats.acc;
@@ -548,20 +585,35 @@ export class AsteroidBlueprint extends GameObject{
             }
         }
 
+        if(this.game.activeModifiers.includes(GameInstance.MOD_FAST_ASTEROIDS_ID)){
+            this.applyVelocity();
+        }
         super.logicUpdate(deltaT);
 
         if(this.isInsideTheScreen()){
             if(this.posX - this.collRange < 0 && this.velX < 0){
                 this.velX = - this.velX
+                if(this.game.activeModifiers.includes(GameInstance.MOD_CANT_SHOOT_ID)){
+                    this.takeDamage(AsteroidBlueprint.CANT_SHOOT_MOD_BOUNCE_DBG);
+                }
             }
             if(this.posY - this.collRange < 0 && this.velY < 0){
                 this.velY = - this.velY
+                if(this.game.activeModifiers.includes(GameInstance.MOD_CANT_SHOOT_ID)){
+                    this.takeDamage(AsteroidBlueprint.CANT_SHOOT_MOD_BOUNCE_DBG);
+                }
             }
             if(this.posX + this.collRange > GameInstance.PIXELS_NUMBER && this.velX > 0){
                 this.velX = - this.velX
+                if(this.game.activeModifiers.includes(GameInstance.MOD_CANT_SHOOT_ID)){
+                    this.takeDamage(AsteroidBlueprint.CANT_SHOOT_MOD_BOUNCE_DBG);
+                }
             }
             if(this.posY + this.collRange > GameInstance.PIXELS_NUMBER && this.velY > 0){
                 this.velY = - this.velY
+                if(this.game.activeModifiers.includes(GameInstance.MOD_CANT_SHOOT_ID)){
+                    this.takeDamage(AsteroidBlueprint.CANT_SHOOT_MOD_BOUNCE_DBG);
+                }
             }
         }else {
             if(this.posX - this.collRange < -GameInstance.ASTEROIDS_TURN_AROUND_SPACE && this.velX < 0){
@@ -749,7 +801,7 @@ export class Player extends GameObject{
             this.timerActionA += deltaT
         }
 
-        if(this.inputActA && this.timerActionA >= this.stats.actADelay){
+        if(this.inputActA && this.timerActionA >= this.stats.actADelay && !this.game.activeModifiers.includes(GameInstance.MOD_CANT_SHOOT_ID)){
             //console.log("inputActA");
             this.timerActionA -= this.stats.actADelay;
             this.actA();
@@ -781,7 +833,7 @@ export class Player extends GameObject{
 
     }
     heal(amount){
-        if(this.alive){
+        if(this.alive && !this.game.activeModifiers.includes(GameInstance.MOD_NO_HEALS_ID)){
             this.health += amount;
             if(this.health > this.stats.maxHealth){
                 this.health = this.stats.maxHealth;
@@ -790,7 +842,7 @@ export class Player extends GameObject{
         }
     }
     takeDamage(dmg) {
-        if(this.timerInvincibility <= 0 && dmg > 0){
+        if(this.timerInvincibility <= 0 && dmg > 0 && !DEBUG_INVINCIBLE_PLAYER){
             super.takeDamage(dmg);
             this.game.elements.healthText.innerText = this.health+"";
         }

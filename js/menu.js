@@ -171,7 +171,6 @@ function setGameModifier(btn){
         }
     }
     textModifierInfo.innerText = text;
-    console.log(text);
     textModifierInfo.style.opacity = "1";
     textModifierInfo.classList.remove("fade_out");
     setTimeout(function (){

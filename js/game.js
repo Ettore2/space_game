@@ -178,7 +178,7 @@ joystick.setRotationOffset(0);
 Joystick.initializeListeners(joystick);
 
 let intervalId = setInterval(function() {
-    if(upFlag || joystick.speed >= 85){
+    if(upFlag || joystick.speed >= 85 || game.activeModifiers.includes(GameInstance.MOD_CANT_STOP_ID)){
         game.player.setInput(GameObject.DIR_UP);
     }
 
@@ -208,7 +208,7 @@ let intervalId = setInterval(function() {
     }
 
 
-    if(actionAFlag){
+    if(actionAFlag || game.activeModifiers.includes(GameInstance.MOD_ALWAYS_SHOOT_ID)){
         game.player.setInput(Player.ACTION_A);
     }
 
