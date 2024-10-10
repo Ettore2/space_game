@@ -1,6 +1,6 @@
 const DEFAULT_IMGS_SCALE = 4;
 
-const DEBUG_INVINCIBLE_PLAYER = true;
+const DEBUG_INVINCIBLE_PLAYER = false;
 
 function drawImage2(game,img, x, y, scale, rotation){
     //console.log(game);
@@ -123,14 +123,14 @@ export class GameInstance {
         this.delay = delay;
         this.elements = elements;
         this.elements.outOfScreenText.innerText=Player.OUTSIDE_THE_SCREEN_TIME+"";
-        this.gameMode = GameMode.getGameMode(gameModeId,this);
-        this.activeModifiers = modifiers;
-        //console.log(this.activeModifiers)
-
 
         this.managedObjs = [];
         this.toAddObj = [];
         this.toRemoveObj = [];
+        this.gameMode = GameMode.getGameMode(gameModeId,this);
+        this.activeModifiers = modifiers;
+        //console.log(this.activeModifiers)
+
 
         //set number of pixels
         canvas.width = GameInstance.PIXELS_NUMBER;
@@ -276,7 +276,8 @@ export class GameObject {
         this.posX = x;
         this.posY = y;
         this.rot = rot
-        this.image = imageName;
+        this.image = new Image();
+        this.image.src = IMGS_DIR+imageName;
         this.collRange = collRange;
         this.game = game;
         this.tag = GameObject.TAG;
@@ -284,6 +285,8 @@ export class GameObject {
         this.timerInvincibility = 0;
         this.invincibilityTime = 0;
         this.blinkTime = 100;
+        this.stayInsideTheScreen = false;
+        this.isTargerForBounceDmg = false;
 
         this.alive = true;
         this.velX = 0;
@@ -337,6 +340,10 @@ export class GameObject {
         drawImage(this.game,this.image,this.posX,this.posY,this.rot);
 
     }
+    distance(obj){
+        return Math.sqrt(Math.pow(this.posX - obj.posX,2)+Math.pow(this.posY - obj.posY,2))
+
+    }
 
 
     //updates
@@ -350,6 +357,48 @@ export class GameObject {
         this.registeredCollisions = [];
         if(this.timerInvincibility > 0){
             this.timerInvincibility -= deltaT;
+        }
+
+        if(this.stayInsideTheScreen){
+            if(this.isInsideTheScreen()){
+                if(this.posX - this.collRange < 0 && this.velX < 0){
+                    this.velX = - this.velX
+                    if(this.game.activeModifiers.includes(GameInstance.MOD_CANT_SHOOT_ID)&&this.isTargerForBounceDmg){
+                        this.takeDamage(AsteroidBlueprint.CANT_SHOOT_MOD_BOUNCE_DBG);
+                    }
+                }
+                if(this.posY - this.collRange < 0 && this.velY < 0){
+                    this.velY = - this.velY
+                    if(this.game.activeModifiers.includes(GameInstance.MOD_CANT_SHOOT_ID)&&this.isTargerForBounceDmg){
+                        this.takeDamage(AsteroidBlueprint.CANT_SHOOT_MOD_BOUNCE_DBG);
+                    }
+                }
+                if(this.posX + this.collRange > GameInstance.PIXELS_NUMBER && this.velX > 0){
+                    this.velX = - this.velX
+                    if(this.game.activeModifiers.includes(GameInstance.MOD_CANT_SHOOT_ID)&&this.isTargerForBounceDmg){
+                        this.takeDamage(AsteroidBlueprint.CANT_SHOOT_MOD_BOUNCE_DBG);
+                    }
+                }
+                if(this.posY + this.collRange > GameInstance.PIXELS_NUMBER && this.velY > 0){
+                    this.velY = - this.velY
+                    if(this.game.activeModifiers.includes(GameInstance.MOD_CANT_SHOOT_ID)&&this.isTargerForBounceDmg){
+                        this.takeDamage(AsteroidBlueprint.CANT_SHOOT_MOD_BOUNCE_DBG);
+                    }
+                }
+            }else {
+                if(this.posX - this.collRange < -GameInstance.ASTEROIDS_TURN_AROUND_SPACE && this.velX < 0){
+                    this.velX = - this.velX
+                }
+                if(this.posY - this.collRange < -GameInstance.ASTEROIDS_TURN_AROUND_SPACE && this.velY < 0){
+                    this.velY = - this.velY
+                }
+                if(this.posX + this.collRange > GameInstance.PIXELS_NUMBER+GameInstance.ASTEROIDS_TURN_AROUND_SPACE && this.velX > 0){
+                    this.velX = - this.velX
+                }
+                if(this.posY + this.collRange > GameInstance.PIXELS_NUMBER+GameInstance.ASTEROIDS_TURN_AROUND_SPACE && this.velY > 0){
+                    this.velY = - this.velY
+                }
+            }
         }
 
     }//"initialize" tho obj at the start of a frame
@@ -454,6 +503,8 @@ export class AsteroidBlueprint extends GameObject{
         //console.log(game);
         this.tag = AsteroidBlueprint.TAG;
         this.isEnemy = true;
+        this.stayInsideTheScreen = true;
+        this.isTargerForBounceDmg = true;
 
         this.type = type;
         this.size = size;
@@ -590,45 +641,6 @@ export class AsteroidBlueprint extends GameObject{
         }
         super.logicUpdate(deltaT);
 
-        if(this.isInsideTheScreen()){
-            if(this.posX - this.collRange < 0 && this.velX < 0){
-                this.velX = - this.velX
-                if(this.game.activeModifiers.includes(GameInstance.MOD_CANT_SHOOT_ID)){
-                    this.takeDamage(AsteroidBlueprint.CANT_SHOOT_MOD_BOUNCE_DBG);
-                }
-            }
-            if(this.posY - this.collRange < 0 && this.velY < 0){
-                this.velY = - this.velY
-                if(this.game.activeModifiers.includes(GameInstance.MOD_CANT_SHOOT_ID)){
-                    this.takeDamage(AsteroidBlueprint.CANT_SHOOT_MOD_BOUNCE_DBG);
-                }
-            }
-            if(this.posX + this.collRange > GameInstance.PIXELS_NUMBER && this.velX > 0){
-                this.velX = - this.velX
-                if(this.game.activeModifiers.includes(GameInstance.MOD_CANT_SHOOT_ID)){
-                    this.takeDamage(AsteroidBlueprint.CANT_SHOOT_MOD_BOUNCE_DBG);
-                }
-            }
-            if(this.posY + this.collRange > GameInstance.PIXELS_NUMBER && this.velY > 0){
-                this.velY = - this.velY
-                if(this.game.activeModifiers.includes(GameInstance.MOD_CANT_SHOOT_ID)){
-                    this.takeDamage(AsteroidBlueprint.CANT_SHOOT_MOD_BOUNCE_DBG);
-                }
-            }
-        }else {
-            if(this.posX - this.collRange < -GameInstance.ASTEROIDS_TURN_AROUND_SPACE && this.velX < 0){
-                this.velX = - this.velX
-            }
-            if(this.posY - this.collRange < -GameInstance.ASTEROIDS_TURN_AROUND_SPACE && this.velY < 0){
-                this.velY = - this.velY
-            }
-            if(this.posX + this.collRange > GameInstance.PIXELS_NUMBER+GameInstance.ASTEROIDS_TURN_AROUND_SPACE && this.velX > 0){
-                this.velX = - this.velX
-            }
-            if(this.posY + this.collRange > GameInstance.PIXELS_NUMBER+GameInstance.ASTEROIDS_TURN_AROUND_SPACE && this.velY > 0){
-                this.velY = - this.velY
-            }
-        }
 
     }
     collisionsResolve(deltaT) {
@@ -1051,9 +1063,10 @@ export class HealthAsteroid extends AsteroidBlueprint{
     }
 }
 export class GameMode{
-    static TOTAL_GAME_MODES = 2;
+    static TOTAL_GAME_MODES = 3;
     static ID_DESTROY_ASTEROIDS = 0;
     static ID_TIME_TRAIL = 1;
+    static ID_CAPTURE_THE_FLAG = 2;
 
     /**
      @param {String} name
@@ -1094,6 +1107,7 @@ export class GameMode{
         switch (gameModeId){
             case 0: return new GameModeDestroyAsteroids(game);
             case 1: return new GameModeTimeTrial(game);
+            case 2: return new GameModeCaptureTheFlag(game);
             default: return null;
         }
     }
@@ -1108,7 +1122,7 @@ export class GameMode{
      @param {int} deltaT
      */
     loop(deltaT){
-        console.log(this.maxAsteroids+Math.floor(this.points/this.difficultyStep))
+        //console.log(this.maxAsteroids+Math.floor(this.points/this.difficultyStep))
         //create new asteroids
         if(this.spawnAsteroids){
             if(this.timerSapwnAsteroids < this.asteroidsSpawnTime){
@@ -1199,6 +1213,27 @@ export class GameModeTimeTrial extends GameMode{
     loop(deltaT){
         super.loop(deltaT);
         this.increasePoints(1)
+    }
+
+}
+export class GameModeCaptureTheFlag extends GameMode{
+
+    /**
+     @param {GameInstance} game
+     */
+    constructor(game) {
+        super("capture the flag","ctf_circle_icon.png",game);
+        this.difficultyStep = 1;
+        this.getPointsFromASteroids = false;
+        if(game!= null){
+            this.game.managedObjs.push(new CTFObjective(null,null,game));
+        }
+    }
+    /**
+     @param {int} deltaT
+     */
+    loop(deltaT){
+        super.loop(deltaT);
     }
 
 }
@@ -1393,6 +1428,53 @@ export class Joystick{
         if(this.rotationOffset < 0){
             this.rotationOffset = 360 + this.rotationOffset;
         }
+
+    }
+}
+export class CTFObjective extends GameObject{
+    static COLL_RANGE = 50;
+    static COLLECT_RANGE = 40;
+    static MIN_SPEED = 2;
+    static MAX_SPEED = 2;
+    static SPAWN_RECT = GameInstance.PIXELS_NUMBER*80/100
+    static POINTS_FOR_CAPTURE = 1
+    static TAG = "ctf_objective";
+    constructor(x,y,game) {
+        super(1, x, y,Math.random()*360, "ctf_circle.png", CTFObjective.COLL_RANGE,game);
+        this.stayInsideTheScreen = true;
+        this.tag = CTFObjective.TAG;
+
+        if(x == null){
+            this.posX = Math.random()*CTFObjective.SPAWN_RECT+(GameInstance.PIXELS_NUMBER-CTFObjective.SPAWN_RECT)/2;
+        }
+        if(y == null){
+            this.posY = Math.random()*CTFObjective.SPAWN_RECT+(GameInstance.PIXELS_NUMBER-CTFObjective.SPAWN_RECT)/2;
+        }
+
+        let speed = Math.random()*(CTFObjective.MAX_SPEED-CTFObjective.MIN_SPEED)+CTFObjective.MIN_SPEED;
+        let speerRot = Math.random()*2*Math.PI;
+
+        this.velX = speed*Math.cos(speerRot);
+        this.velY = speed*Math.sin(speerRot);
+
+        this.velRot = 1;
+    }
+
+    collect(){
+        this.game.gameMode.increasePoints(CTFObjective.POINTS_FOR_CAPTURE);
+        this.game.managedObjs.push(new CTFObjective(null,null,this.game));
+        this.die();
+    }
+
+    collisionsResolve(deltaT) {
+        for(let i = 0; i < this.registeredCollisions.length; i++){
+            if(this.registeredCollisions[i].tag === Player.TAG &&
+            this.distance(this.registeredCollisions[i])-this.registeredCollisions[i].collRange <= CTFObjective.COLLECT_RANGE){
+                this.collect();
+
+            }
+        }
+        super.collisionsResolve(deltaT);
 
     }
 }
