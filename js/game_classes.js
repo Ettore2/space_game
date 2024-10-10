@@ -1436,7 +1436,7 @@ export class CTFObjective extends GameObject{
     static COLLECT_RANGE = 40;
     static MIN_SPEED = 2;
     static MAX_SPEED = 2;
-    static SPAWN_RECT = GameInstance.PIXELS_NUMBER*80/100
+    static SPAWN_RECT = GameInstance.PIXELS_NUMBER*65/100
     static POINTS_FOR_CAPTURE = 1
     static TAG = "ctf_objective";
     constructor(x,y,game) {
