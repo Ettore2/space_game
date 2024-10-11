@@ -149,7 +149,7 @@ export class GameInstance {
 
         if(this.activeModifiers.includes(GameInstance.MOD_RANDOM_SPACESHIP_ID)){
             playerTypeId = Math.floor(Math.random()*(Player.statsRegistry.length));
-            console.log(playerTypeId);
+            //console.log(playerTypeId);
         }
 
         this.player = new Player(playerTypeId,GameInstance.PIXELS_NUMBER/2,GameInstance.PIXELS_NUMBER/2,this);
@@ -310,6 +310,7 @@ export class GameInstance {
                 this.elements.outOfScreenDiv.style.visibility = "hidden";
                 this.deathDiv.style.visibility = "visible";
                 this.deathDiv.style.left = (window.innerWidth-this.deathDiv.getBoundingClientRect().width)/2+"px";//necessary
+                //console.log(sessionStorage.getItem(SESSION_MODIFIERS_IDS))
                 break
         }//enter new state
     }

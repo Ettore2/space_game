@@ -92,7 +92,11 @@ for(let i = 0; i < Player.statsRegistry.length; i++){
         setSelectedCharacter(event.target);
     })
 }
-setSelectedCharacter(btnsCharacters[0]);//initialize character selected
+if(sessionStorage.getItem(SESSION_SPACESHIP_ID) != null){
+    setSelectedCharacter(btnsCharacters[Number(sessionStorage.getItem(SESSION_SPACESHIP_ID))]);//initialize character selected
+}else{
+    setSelectedCharacter(btnsCharacters[0]);
+}//initialize character selected
 
 //create game mode buttons
 divTmp = document.getElementById("div_game_mode_selection");
@@ -111,7 +115,11 @@ for(let i = 0; i < GameMode.TOTAL_GAME_MODES; i++){
         setSelectedGameMode(event.target);
     })
 }
-setSelectedGameMode(btnsGameModes[0]);//initialize character selected
+if(sessionStorage.getItem(SESSION_GAME_MODE_ID) != null){
+    setSelectedGameMode(btnsGameModes[Number(sessionStorage.getItem(SESSION_GAME_MODE_ID))]);//initialize character selected
+}else{
+    setSelectedGameMode(btnsGameModes[0]);
+}//initialize character selected
 
 //create game modifiers buttons
 divTmp = document.getElementById("div_game_modifiers_selection");
@@ -130,7 +138,13 @@ for(let i = 0; i < GameInstance.MODIFIERS.length; i++){
         setGameModifier(event.target);
     })
 }
-
+if(sessionStorage.getItem(SESSION_MODIFIERS_IDS) != null){
+    let mod = sessionStorage.getItem(SESSION_MODIFIERS_IDS).split(",");
+    //console.log(sessionStorage.getItem(SESSION_MODIFIERS_IDS));
+    for(let i = 0; i < mod.length; i++){
+        setGameModifier(btnsModifiers[Number(mod[i])]);
+    }
+}//initialize character selected
 
 function setSelectedCharacter(btn){
     if (selectedCharacter != null){
