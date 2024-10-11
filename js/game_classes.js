@@ -6,6 +6,7 @@ function drawImage2(game,img, x, y, scale, rotation){
     //console.log(game);
     //console.log(game.ctx);
     //console.log(img);
+    //console.log("drawImage2");
 
     game.ctx.setTransform(scale, 0, 0, scale, x, y); // sets scale and origin
     game.ctx.rotate(degreesToRads(-rotation));
@@ -211,26 +212,11 @@ export class GameInstance {
                 this.ctx.fillStyle = "#100225";
                 this.ctx.fillRect(0, 0, GameInstance.PIXELS_NUMBER, GameInstance.PIXELS_NUMBER);
                 //do a script that can draw stars?
-
-                /*
-                let img;
-                img = new Image();
-                img.src='sprites/player_0.png';
-                drawImage(this,img,30,30,0);
-                img = new Image();
-                img.src='sprites/asteroid_mega_1.png';
-                drawImage(this,img,100,100,0);
-                img = new Image();
-                img.src='sprites/asteroid_big_1.png';
-                drawImage(this,img,100,30,0);
-                img = new Image();
-                img.src='sprites/asteroid_small_1.png';
-                drawImage(this,img,30,100,0);*/
+                //console.log("paint all")
 
                 for(let i = this.managedObjs.length-1; i >= 0; i--){
                     this.managedObjs[i].graphicUpdate(this.delay);
                 }//draw
-
 
                 for(let i = 0; i < this.toRemoveObj.length; i++){
                     if(this.managedObjs.includes(this.toRemoveObj[i],0)){
@@ -311,6 +297,8 @@ export class GameInstance {
                 this.deathDiv.style.visibility = "visible";
                 this.deathDiv.style.left = (window.innerWidth-this.deathDiv.getBoundingClientRect().width)/2+"px";//necessary
                 //console.log(sessionStorage.getItem(SESSION_MODIFIERS_IDS))
+                this.ctx.fillStyle = "rgba(0,0,0,0.66)";
+                this.ctx.fillRect(0,0,GameInstance.PIXELS_NUMBER,GameInstance.PIXELS_NUMBER);
                 break
         }//enter new state
     }
