@@ -19,7 +19,7 @@ const CLICK_ON_AUDIO = "../audios/button_click2.wav"
 const CLICK_OFF_AUDIO = "../audios/button_click.wav"
 
 document.getElementById("question_mark_icon").addEventListener("click",function (){
-    playSound(CLICK_ON_AUDIO);
+    //playSound(CLICK_ON_AUDIO);
     alert("w to go forward; a,d to turn; enter or space to shoot; esc to pause");
 })
 document.getElementById("btn_play").addEventListener("click",function (){
