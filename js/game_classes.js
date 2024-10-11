@@ -145,6 +145,7 @@ export class GameInstance {
         this.newGameState = null;
         this.pauseCurrAlfa = 1;
         this.pauseBlincState = false;
+        this.deathDiv = elements.deathDiv;
 
         if(this.activeModifiers.includes(GameInstance.MOD_RANDOM_SPACESHIP_ID)){
             playerTypeId = Math.floor(Math.random()*(Player.statsRegistry.length));
@@ -307,6 +308,8 @@ export class GameInstance {
                 break
             case GameInstance.STATE_LOST:
                 this.elements.outOfScreenDiv.style.visibility = "hidden";
+                this.deathDiv.style.visibility = "visible";
+                this.deathDiv.style.left = (window.innerWidth-this.deathDiv.getBoundingClientRect().width)/2+"px";//necessary
                 break
         }//enter new state
     }

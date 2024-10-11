@@ -12,6 +12,7 @@ p{
     -webkit-user-select: none;
     user-select: none;
 }
+
 #game_canvas{
     margin: auto;
     padding: 0;
@@ -35,6 +36,7 @@ p{
     box-shadow: 0 5px #9a0000;
 
 }
+
 .out_of_screen_text{
     width: 100%;
     margin: 10% auto;
@@ -74,4 +76,31 @@ p{
     display: flex;
     width: 100%;
     margin-top: 3%;
+}
+.death_div{
+    position: absolute;
+    width: fit-content;
+}
+.death_btn{
+    margin: 1vw 0 0 0;
+    padding: 1% 1% 1% 1%;
+    background-color: rgba(0,0,0,0);
+    width: 100%;
+
+    border-radius: 8px;
+    border: 0.4vw solid aliceblue;
+
+    user-drag: none;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+.death_btn:hover{
+    background-color: rgba(255, 255, 255, 0.18);
+}
+.death_btn_text{
+    margin: 0;
+    color: white;
 }

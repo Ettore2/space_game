@@ -40,8 +40,8 @@ let divLeft = document.getElementById("div_left")
 let divMid = document.getElementById("div_mid")
 let divRight = document.getElementById("div_right")
 
-let w = window.innerWidth*100/100;
-let h = window.innerHeight*100/100;
+let w = window.innerWidth;
+let h = window.innerHeight;
 
 let canvas = document.getElementById("game_canvas");
 
@@ -77,6 +77,34 @@ joystickDiv.appendChild(joystickCanvas);
 joystickDiv.style.width ="fit-content"
 joystickDiv.style.height ="fit-content"
 joystickDiv.style.padding="2%";
+
+//death screen
+let deathDiv = document.createElement("div");
+{
+    document.body.appendChild(deathDiv);
+    deathDiv.style.visibility = "hidden";
+    deathDiv.classList.add("death_div");
+    let btnTmp,textTmp;
+
+    btnTmp = document.createElement("button");
+    textTmp = document.createElement("p");
+    btnTmp.appendChild(textTmp);
+    deathDiv.appendChild(btnTmp);
+    textTmp.innerText = "quit";
+    btnTmp.classList.add("death_btn");
+    textTmp.classList.add("death_btn_text");
+    btnTmp.addEventListener("click",function (){window.location.href = "./menu.html";});
+
+    btnTmp = document.createElement("button");
+    textTmp = document.createElement("p");
+    btnTmp.appendChild(textTmp);
+    deathDiv.appendChild(btnTmp);
+    textTmp.innerText = "play again";
+    btnTmp.classList.add("death_btn");
+    textTmp.classList.add("death_btn_text");
+    btnTmp.addEventListener("click",function (){window.location.href = "./game.html";});
+
+}
 
 let actionABtn = document.createElement("button");
 actionABtn.id = "action_a_btn";
@@ -144,14 +172,16 @@ if(h > w){
     actionABtn.style.margin = (h*85/100-joystickSize*ACTION_A_BTN_SIZE_PERCENTAGE/100)+"px auto 0% 30%";
     actionABtn.style.width = joystickSize*ACTION_A_BTN_SIZE_PERCENTAGE/100+"px";
 }//build the screen
-outOfScreenDiv.style.top = canvasWidthPx/3+"px"
+outOfScreenDiv.style.top = canvasWidthPx/3+"px";
+deathDiv.style.top = canvasWidthPx/3+"px";
+deathDiv.style.left = (w-deathDiv.getBoundingClientRect().width)/2+"px";
 if(h > w){
     outOfScreenDiv.style.left = (canvasWidthPx - canvasWidthPx*OUT_OF_SCREEN_DIV_WIDTH_PERCENTAGE/100)/2+"px"
 }else {
     outOfScreenDiv.style.left = (w*DIV_LEFT_WIDTH_PERCENTAGE/100+(canvasWidthPx - canvasWidthPx*OUT_OF_SCREEN_DIV_WIDTH_PERCENTAGE/100)/2)+"px"
 }//set out of screen text pos
-canvas.style.height = canvasWidthPx+"px"
-canvas.style.width = canvasWidthPx+"px"
+canvas.style.height = canvasWidthPx+"px";
+canvas.style.width = canvasWidthPx+"px";
 
 
 //cage creation things-------------------------------------------------------
@@ -161,6 +191,7 @@ let elements = {
     healthText : healthText,
     healthImg : healthImg,
     outOfScreenDiv : outOfScreenDiv,
+    deathDiv : deathDiv,
     outOfScreenText : outOfScreenText,
 
 }
