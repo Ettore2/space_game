@@ -1085,7 +1085,7 @@ export class GameMode{
 
         this.spawnAsteroids = true;
         this.getPointsFromASteroids = true;
-        this.asteroidsTypesSpawnRate = [80,20];
+        this.asteroidsTypesSpawnRate = [85,15];
         this.asteroidsSizesSpawnRate = [
             [60,30,10],
             [100]
