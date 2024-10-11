@@ -21,7 +21,8 @@ if(sessionStorage.getItem(SESSION_GAME_MODE_ID) == null ||
 let keyUp = "w";
 let keyLeft = "a";
 let keyRight = "d";
-let keyActionA = "Enter";
+let keyAction1A = "Enter";
+let keyAction2A = " ";
 let keyPause = "Escape";
 let upFlag = false;
 let leftFlag = false;
@@ -236,7 +237,8 @@ document.addEventListener("keydown", function(e){
             game.player.setInput(GameObject.DIR_RIGHT);
             rightFlag = true;
             break
-        case keyActionA:
+        case keyAction1A:
+        case keyAction2A:
             //console.log("keyActionA")
             game.player.setInput(Player.ACTION_A);
             actionAFlag = true;
@@ -268,7 +270,8 @@ document.addEventListener("keyup", function(e){
             //console.log("keyRight")
             rightFlag = false;
             break
-        case keyActionA:
+        case keyAction1A:
+        case keyAction2A:
             //console.log("keyActionA")
             actionAFlag = false;
             break

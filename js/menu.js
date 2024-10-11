@@ -16,7 +16,7 @@ const COLOR_TRANSPARENT = "rgba(0,0,0,0)";
 const INFO_MODIFIER_FADE_OUT_DELAY = 2000;
 
 document.getElementById("question_mark_icon").addEventListener("click",function (){
-    alert("w to go forward; a,d to turn; enter to shoot; esc to pause");
+    alert("w to go forward; a,d to turn; enter or space to shoot; esc to pause");
 })
 document.getElementById("btn_play").addEventListener("click",function (){
     let tmp;
