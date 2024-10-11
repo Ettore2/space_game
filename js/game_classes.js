@@ -38,6 +38,11 @@ export function arrayRemove(arr, value) {
     }
 
 }
+export function playSound(soundPath){
+    let sound = document.createElement("AUDIO");
+    sound.src = soundPath;
+    sound.play();
+}
 
 
 
@@ -269,39 +274,39 @@ export class GameInstance {
     }
     actuallyUpdateCurrGameSate(){
         if(this.gameState !== this.newGameState && this.newGameState != null) {
-        switch (this.gameState) {
-            case GameInstance.STATE_PLAY:
-                break
-            case GameInstance.STATE_PAUSE:
-                this.elements.outOfScreenDiv.style.visibility = "hidden";
-                this.elements.outOfScreenDiv.style.opacity = 1;
-                break
-            case GameInstance.STATE_LOST:
-                break
-        }//exit old state
+            switch (this.gameState) {
+                case GameInstance.STATE_PLAY:
+                    break
+                case GameInstance.STATE_PAUSE:
+                    this.elements.outOfScreenDiv.style.visibility = "hidden";
+                    this.elements.outOfScreenDiv.style.opacity = 1;
+                    break
+                case GameInstance.STATE_LOST:
+                    break
+            }//exit old state
 
-        this.gameState = this.newGameState;
+            this.gameState = this.newGameState;
 
-        switch (this.gameState) {
-            case GameInstance.STATE_PLAY:
-                break
-            case GameInstance.STATE_PAUSE:
-                this.pauseCurrAlfa = 1;
-                this.pauseBlincState = false;
-                this.elements.outOfScreenDiv.style.opacity = this.pauseCurrAlfa;
-                this.elements.outOfScreenDiv.style.visibility = "visible";
-                this.elements.outOfScreenText.innerText = GameInstance.PAUSE_MSG;
-                break
-            case GameInstance.STATE_LOST:
-                this.elements.outOfScreenDiv.style.visibility = "hidden";
-                this.deathDiv.style.visibility = "visible";
-                this.deathDiv.style.left = (window.innerWidth-this.deathDiv.getBoundingClientRect().width)/2+"px";//necessary
-                //console.log(sessionStorage.getItem(SESSION_MODIFIERS_IDS))
-                this.ctx.fillStyle = "rgba(0,0,0,0.66)";
-                this.ctx.fillRect(0,0,GameInstance.PIXELS_NUMBER,GameInstance.PIXELS_NUMBER);
-                break
-        }//enter new state
-    }
+            switch (this.gameState) {
+                case GameInstance.STATE_PLAY:
+                    break
+                case GameInstance.STATE_PAUSE:
+                    this.pauseCurrAlfa = 1;
+                    this.pauseBlincState = false;
+                    this.elements.outOfScreenDiv.style.opacity = this.pauseCurrAlfa;
+                    this.elements.outOfScreenDiv.style.visibility = "visible";
+                    this.elements.outOfScreenText.innerText = GameInstance.PAUSE_MSG;
+                    break
+                case GameInstance.STATE_LOST:
+                    this.elements.outOfScreenDiv.style.visibility = "hidden";
+                    this.deathDiv.style.visibility = "visible";
+                    this.deathDiv.style.left = (window.innerWidth-this.deathDiv.getBoundingClientRect().width)/2+"px";//necessary
+                    //console.log(sessionStorage.getItem(SESSION_MODIFIERS_IDS))
+                    this.ctx.fillStyle = "rgba(0,0,0,0.66)";
+                    this.ctx.fillRect(0,0,GameInstance.PIXELS_NUMBER,GameInstance.PIXELS_NUMBER);
+                    break
+            }//enter new state
+        }
 
     }
 }

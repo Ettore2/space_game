@@ -6,7 +6,7 @@ import {
     Player,
     SESSION_GAME_MODE_ID,
     SESSION_SPACESHIP_ID,
-    SESSION_MODIFIERS_IDS
+    SESSION_MODIFIERS_IDS, playSound
 } from "./game_classes.js";
 const IMGS_DIR = "../sprites/";
 const COLOR_SELECTED_CHARACTER = "rgba(255, 255, 255, 0.18)";
@@ -15,10 +15,15 @@ const COLOR_WHITE = "rgba(255, 255, 255)";
 const COLOR_TRANSPARENT = "rgba(0,0,0,0)";
 const INFO_MODIFIER_FADE_OUT_DELAY = 2000;
 
+const CLICK_ON_AUDIO = "../audios/button_click2.wav"
+const CLICK_OFF_AUDIO = "../audios/button_click.wav"
+
 document.getElementById("question_mark_icon").addEventListener("click",function (){
+    playSound(CLICK_ON_AUDIO);
     alert("w to go forward; a,d to turn; enter or space to shoot; esc to pause");
 })
 document.getElementById("btn_play").addEventListener("click",function (){
+    //playSound(CLICK_ON_AUDIO);
     let tmp;
 
     //save selected character on js session
@@ -64,7 +69,6 @@ let selectedModifiersInfoTimer
 let textModifierInfo = document.getElementById("text_modifier_info");
 
 
-
 let divTmp
 
 //responsive
@@ -89,6 +93,7 @@ for(let i = 0; i < Player.statsRegistry.length; i++){
     btnTmp.style.backgroundSize = "80%";
     btnTmp.style.backgroundRepeat = "no-repeat";
     btnTmp.addEventListener("click", function(){
+        playSound(CLICK_ON_AUDIO);
         setSelectedCharacter(event.target);
     })
 }
@@ -112,6 +117,7 @@ for(let i = 0; i < GameMode.TOTAL_GAME_MODES; i++){
     btnTmp.style.backgroundSize = "80%";
     btnTmp.style.backgroundRepeat = "no-repeat";
     btnTmp.addEventListener("click", function(){
+        playSound(CLICK_ON_AUDIO);
         setSelectedGameMode(event.target);
     })
 }
@@ -135,6 +141,11 @@ for(let i = 0; i < GameInstance.MODIFIERS.length; i++){
     btnTmp.style.backgroundSize = "80%";
     btnTmp.style.backgroundRepeat = "no-repeat";
     btnTmp.addEventListener("click", function(){
+        if(selectedModifiers.includes(event.target)){
+            playSound(CLICK_OFF_AUDIO);
+        }else{
+            playSound(CLICK_ON_AUDIO);
+        }
         setGameModifier(event.target);
     })
 }
