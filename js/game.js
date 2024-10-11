@@ -22,6 +22,7 @@ let keyUp = "w";
 let keyLeft = "a";
 let keyRight = "d";
 let keyActionA = "Enter";
+let keyPause = "Escape";
 let upFlag = false;
 let leftFlag = false;
 let rightFlag = false;
@@ -239,6 +240,16 @@ document.addEventListener("keydown", function(e){
             //console.log("keyActionA")
             game.player.setInput(Player.ACTION_A);
             actionAFlag = true;
+            break
+        case keyPause:
+            switch (game.gameState){
+                case GameInstance.STATE_PLAY:
+                    game.setGameState(GameInstance.STATE_PAUSE);
+                    break;
+                case GameInstance.STATE_PAUSE:
+                    game.setGameState(GameInstance.STATE_PLAY);
+                    break;
+            }
             break
     }
 });

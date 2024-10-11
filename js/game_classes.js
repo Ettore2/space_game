@@ -51,6 +51,8 @@ export class GameInstance {
     static STATE_PLAY = 1;
     static STATE_PAUSE = 0;
     static STATE_LOST = 2;
+    static PAUSE_MSG = "pause";
+    static PAUSE_MSG_PULSE_SPEED = 0.01;
     static PIXELS_NUMBER = 2400;
     static ASTEROIDS_TURN_AROUND_SPACE = 600;
     static ASTEROIDS_SPAWN_SPACE = GameInstance.ASTEROIDS_TURN_AROUND_SPACE / 2;
@@ -140,6 +142,9 @@ export class GameInstance {
 
 
         this.gameState = GameInstance.STATE_PLAY;
+        this.newGameState = null;
+        this.pauseCurrAlfa = 1;
+        this.pauseBlincState = false;
 
         if(this.activeModifiers.includes(GameInstance.MOD_RANDOM_SPACESHIP_ID)){
             playerTypeId = Math.floor(Math.random()*(Player.statsRegistry.length));
@@ -226,11 +231,6 @@ export class GameInstance {
                 }//draw
 
 
-                //draw hearts?
-
-                //program for spawning new obstacles
-
-
                 for(let i = 0; i < this.toRemoveObj.length; i++){
                     if(this.managedObjs.includes(this.toRemoveObj[i],0)){
                         arrayRemove(this.managedObjs,this.toRemoveObj[i]);
@@ -246,10 +246,70 @@ export class GameInstance {
 
                 break;
             case GameInstance.STATE_PAUSE:
+                //console.log("state pause");
+                if(this.pauseBlincState){
+                    this.pauseCurrAlfa += GameInstance.PAUSE_MSG_PULSE_SPEED;
+                    if(this.pauseCurrAlfa > 1){
+                        this.pauseBlincState = !this.pauseBlincState;
+                        this.pauseCurrAlfa = 2 -this.pauseCurrAlfa;
+                    }
+                }else{
+                    this.pauseCurrAlfa -= GameInstance.PAUSE_MSG_PULSE_SPEED;
+                    if(this.pauseCurrAlfa < 0){
+                        this.pauseBlincState = !this.pauseBlincState;
+                        this.pauseCurrAlfa = -this.pauseCurrAlfa;
+                    }
+                }
+                this.elements.outOfScreenDiv.style.opacity = this.pauseCurrAlfa;
+                //console.log(this.pauseCurrAlfa);
+                break
+            case GameInstance.STATE_LOST:
+                //console.log("state lost");
+                break
+        }
+
+        //state update
+        this.actuallyUpdateCurrGameSate();
+    }
+    /**
+     @param {int} newState
+     */
+    setGameState(newState){
+        if(this.gameState !== newState) {
+            this.newGameState = newState;
+        }
+
+    }
+    actuallyUpdateCurrGameSate(){
+        if(this.gameState !== this.newGameState && this.newGameState != null) {
+        switch (this.gameState) {
+            case GameInstance.STATE_PLAY:
+                break
+            case GameInstance.STATE_PAUSE:
+                this.elements.outOfScreenDiv.style.visibility = "hidden";
+                this.elements.outOfScreenDiv.style.opacity = 1;
                 break
             case GameInstance.STATE_LOST:
                 break
-        }
+        }//exit old state
+
+        this.gameState = this.newGameState;
+
+        switch (this.gameState) {
+            case GameInstance.STATE_PLAY:
+                break
+            case GameInstance.STATE_PAUSE:
+                this.pauseCurrAlfa = 1;
+                this.pauseBlincState = false;
+                this.elements.outOfScreenDiv.style.opacity = this.pauseCurrAlfa;
+                this.elements.outOfScreenDiv.style.visibility = "visible";
+                this.elements.outOfScreenText.innerText = GameInstance.PAUSE_MSG;
+                break
+            case GameInstance.STATE_LOST:
+                this.elements.outOfScreenDiv.style.visibility = "hidden";
+                break
+        }//enter new state
+    }
 
     }
 }
@@ -748,7 +808,7 @@ export class Player extends GameObject{
     die(){
         if(this.alive){
             super.die();
-            this.game.gameState = GameInstance.STATE_LOST;
+            this.game.setGameState(GameInstance.STATE_LOST);
         }
     }
     logicUpdate(deltaT) {
