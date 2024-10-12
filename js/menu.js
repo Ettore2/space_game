@@ -9,21 +9,21 @@ import {
     SESSION_MODIFIERS_IDS, playSound
 } from "./game_classes.js";
 const IMGS_DIR = "../sprites/";
+const AUDIO_DIR = "../audios/";
+
 const COLOR_SELECTED_CHARACTER = "rgba(255, 255, 255, 0.18)";
 const COLOR_NON_SELECTED_CHARACTER = "rgba(0,0,0,0)";
 const COLOR_WHITE = "rgba(255, 255, 255)";
 const COLOR_TRANSPARENT = "rgba(0,0,0,0)";
 const INFO_MODIFIER_FADE_OUT_DELAY = 2000;
 
-const CLICK_ON_AUDIO = "../audios/button_click2.wav"
-const CLICK_OFF_AUDIO = "../audios/button_click.wav"
+const CLICK_ON_AUDIO = AUDIO_DIR+"button_click2.wav"
+const CLICK_OFF_AUDIO = AUDIO_DIR+"button_click.wav"
 
 document.getElementById("question_mark_icon").addEventListener("click",function (){
-    //playSound(CLICK_ON_AUDIO);
     alert("w to go forward; a,d to turn; enter or space to shoot; esc to pause");
 })
 document.getElementById("btn_play").addEventListener("click",function (){
-    //playSound(CLICK_ON_AUDIO);
     let tmp;
 
     //save selected character on js session
@@ -93,11 +93,12 @@ for(let i = 0; i < Player.statsRegistry.length; i++){
     btnTmp.style.backgroundSize = "80%";
     btnTmp.style.backgroundRepeat = "no-repeat";
     btnTmp.addEventListener("click", function(){
-        playSound(CLICK_ON_AUDIO);
+
         setSelectedCharacter(event.target);
+        playSoundMenu(CLICK_ON_AUDIO);
     })
 }
-if(sessionStorage.getItem(SESSION_SPACESHIP_ID) != null){
+if(sessionStorage.getItem(SESSION_SPACESHIP_ID) != null && sessionStorage.getItem(SESSION_SPACESHIP_ID) !== ""){
     setSelectedCharacter(btnsCharacters[Number(sessionStorage.getItem(SESSION_SPACESHIP_ID))]);//initialize character selected
 }else{
     setSelectedCharacter(btnsCharacters[0]);
@@ -117,11 +118,11 @@ for(let i = 0; i < GameMode.TOTAL_GAME_MODES; i++){
     btnTmp.style.backgroundSize = "80%";
     btnTmp.style.backgroundRepeat = "no-repeat";
     btnTmp.addEventListener("click", function(){
-        playSound(CLICK_ON_AUDIO);
         setSelectedGameMode(event.target);
+        playSoundMenu(CLICK_ON_AUDIO);
     })
 }
-if(sessionStorage.getItem(SESSION_GAME_MODE_ID) != null){
+if(sessionStorage.getItem(SESSION_GAME_MODE_ID) != null && sessionStorage.getItem(SESSION_GAME_MODE_ID) !== ""){
     setSelectedGameMode(btnsGameModes[Number(sessionStorage.getItem(SESSION_GAME_MODE_ID))]);//initialize character selected
 }else{
     setSelectedGameMode(btnsGameModes[0]);
@@ -141,15 +142,15 @@ for(let i = 0; i < GameInstance.MODIFIERS.length; i++){
     btnTmp.style.backgroundSize = "80%";
     btnTmp.style.backgroundRepeat = "no-repeat";
     btnTmp.addEventListener("click", function(){
-        if(selectedModifiers.includes(event.target)){
-            playSound(CLICK_OFF_AUDIO);
-        }else{
-            playSound(CLICK_ON_AUDIO);
-        }
         setGameModifier(event.target);
+        if(selectedModifiers.includes(event.target)){
+            playSoundMenu(CLICK_ON_AUDIO);
+        }else{
+            playSoundMenu(CLICK_OFF_AUDIO);
+        }
     })
 }
-if(sessionStorage.getItem(SESSION_MODIFIERS_IDS) != null){
+if(sessionStorage.getItem(SESSION_MODIFIERS_IDS) != null && sessionStorage.getItem(SESSION_MODIFIERS_IDS) !== ""){
     let mod = sessionStorage.getItem(SESSION_MODIFIERS_IDS).split(",");
     //console.log(sessionStorage.getItem(SESSION_MODIFIERS_IDS));
     for(let i = 0; i < mod.length; i++){
@@ -205,6 +206,11 @@ function setGameModifier(btn){
 
 
 
+}
+function playSoundMenu(soundPath){
+    if(!selectedModifiers.includes(btnsModifiers[GameInstance.MOD_NO_SOUND_EFFECTS_ID])){
+        playSound(soundPath)
+    }
 }
 
 

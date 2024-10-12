@@ -39,14 +39,24 @@ export function arrayRemove(arr, value) {
 
 }
 export function playSound(soundPath){
+    playSound2(soundPath,1);
+}
+export function playSound2(soundPath,vol){
     let sound = document.createElement("AUDIO");
     sound.src = soundPath;
+    sound.volume = vol;
     sound.play();
+}
+export function playSound3(soundPath,vol,game){
+    if(!game.activeModifiers.includes(GameInstance.MOD_NO_SOUND_EFFECTS_ID)){
+        playSound2(soundPath,vol)
+    }
 }
 
 
 
 const IMGS_DIR = "../sprites/";
+const AUDIO_DIR = "../audios/";
 export const SESSION_SPACESHIP_ID = "session_spaceship_id"
 export const SESSION_GAME_MODE_ID = "session_game_mode_id"
 export const SESSION_MODIFIERS_IDS = "session_modifiers_ids"
@@ -62,6 +72,11 @@ export class GameInstance {
     static PIXELS_NUMBER = 2400;
     static ASTEROIDS_TURN_AROUND_SPACE = 600;
     static ASTEROIDS_SPAWN_SPACE = GameInstance.ASTEROIDS_TURN_AROUND_SPACE / 2;
+
+    static PAUSE_SOUND = "pause.mp3";
+    static PAUSE_VOL = 0.5;
+    static UNPAUSE_SOUND = "unpause.mp3";
+    static UNPAUSE_VOL = 0.5;
 
     static MOD_ALWAYS_SHOOT = {
     name: "always shoot",
@@ -92,9 +107,13 @@ export class GameInstance {
         img: "no_heals_modifier.png"
 };
     static MOD_RANDOM_SPACESHIP = {
-    name: "random spaceship",
+        name: "random spaceship",
         img: "random_ship_modifier.png"
-};
+    };
+    static MOD_NO_SOUND_EFFECTS = {
+        name: "no sound effects",
+        img: "no_sound_effects_modifier.png"
+    };
 
     static MODIFIERS = [
         this.MOD_ALWAYS_SHOOT,
@@ -104,7 +123,8 @@ export class GameInstance {
         this.MOD_BIG_ASTEROIDS,
         this.MOD_STRONG_ASTEROIDS,
         this.MOD_HO_HEALS,
-        this.MOD_RANDOM_SPACESHIP
+        this.MOD_RANDOM_SPACESHIP,
+        this.MOD_NO_SOUND_EFFECTS
     ]
 
     static MOD_ALWAYS_SHOOT_ID = this.MODIFIERS.indexOf(this.MOD_ALWAYS_SHOOT);
@@ -115,6 +135,7 @@ export class GameInstance {
     static MOD_STRONG_ASTEROIDS_ID = this.MODIFIERS.indexOf(this.MOD_STRONG_ASTEROIDS);
     static MOD_NO_HEALS_ID = this.MODIFIERS.indexOf(this.MOD_HO_HEALS);
     static MOD_RANDOM_SPACESHIP_ID = this.MODIFIERS.indexOf(this.MOD_RANDOM_SPACESHIP);
+    static MOD_NO_SOUND_EFFECTS_ID = this.MODIFIERS.indexOf(this.MOD_NO_SOUND_EFFECTS);
 
 
 
@@ -278,6 +299,7 @@ export class GameInstance {
                 case GameInstance.STATE_PLAY:
                     break
                 case GameInstance.STATE_PAUSE:
+                    playSound3(AUDIO_DIR+GameInstance.UNPAUSE_SOUND,GameInstance.UNPAUSE_VOL,this);
                     this.elements.outOfScreenDiv.style.visibility = "hidden";
                     this.elements.outOfScreenDiv.style.opacity = 1;
                     break
@@ -291,11 +313,13 @@ export class GameInstance {
                 case GameInstance.STATE_PLAY:
                     break
                 case GameInstance.STATE_PAUSE:
+                    playSound3(AUDIO_DIR+GameInstance.PAUSE_SOUND,GameInstance.PAUSE_VOL,this);
                     this.pauseCurrAlfa = 1;
                     this.pauseBlincState = false;
                     this.elements.outOfScreenDiv.style.opacity = this.pauseCurrAlfa;
                     this.elements.outOfScreenDiv.style.visibility = "visible";
-                    this.elements.outOfScreenText.innerText = GameInstance.PAUSE_MSG;
+                    this.elements.outOfScreenText.innerText = GameInstance.PAUSE_MSG;this.ctx.fillStyle = "rgba(0,0,0,0.66)";
+                    this.ctx.fillRect(0,0,GameInstance.PIXELS_NUMBER,GameInstance.PIXELS_NUMBER);
                     break
                 case GameInstance.STATE_LOST:
                     this.elements.outOfScreenDiv.style.visibility = "hidden";
@@ -508,10 +532,12 @@ export class AsteroidBlueprint extends GameObject{
                 min_spawn_rot_speed : 1,
                 max_spawn_rot_speed : 20,
                 max_speed : 10,
-                acc : 0
+                acc : 0,
+                deathSound : "explosion_c.mp3",
+                deathVol : 0.15
             },
             {
-                children : 3,
+                children : 2,
                 health : 6,
                 name : "asteroid big",
                 images : ["asteroid_big_1.png","asteroid_big_2.png","asteroid_big_3.png"],
@@ -521,7 +547,9 @@ export class AsteroidBlueprint extends GameObject{
                 min_spawn_rot_speed : 1,
                 max_spawn_rot_speed : 12,
                 max_speed : 10,
-                acc : 0
+                acc : 0,
+                deathSound : "explosion_c.mp3",
+                deathVol : 0.3
             },
             {
                 children : 3,
@@ -534,7 +562,9 @@ export class AsteroidBlueprint extends GameObject{
                 min_spawn_rot_speed : 1,
                 max_spawn_rot_speed : 6,
                 max_speed : 10,
-                acc : 0
+                acc : 0,
+                deathSound : "explosion_c.mp3",
+                deathVol : 0.4
             }
         ],
         [
@@ -549,7 +579,9 @@ export class AsteroidBlueprint extends GameObject{
                 min_spawn_rot_speed : 1,
                 max_spawn_rot_speed : 20,
                 max_speed : 10,
-                acc : 0
+                acc : 0,
+                deathSound : "explosion_c.mp3",
+                deathVol : 0.15
             },
         ]
     ];
@@ -621,6 +653,7 @@ export class AsteroidBlueprint extends GameObject{
     die(){
         if(this.alive){
             super.die()
+            playSound3(AUDIO_DIR+this.stats.deathSound,this.stats.deathVol,this.game);
             this.game.gameMode.currAsteroids --;
             if(this.game.gameMode.getPointsFromASteroids){
                 this.game.gameMode.increasePoints(1);
@@ -719,6 +752,8 @@ export class Player extends GameObject{
     static ID_SNIPER = 2;
     static ID_BLOPPER = 3;
     static OUTSIDE_THE_SCREEN_TIME = 3000;
+    static HEAL_SOUND = "heal.wav";
+    static HEAL_VOL = 0.25;
 
     static statsRegistry = [
         {
@@ -733,7 +768,11 @@ export class Player extends GameObject{
             actADelay: 400,
             rotSpeed: 4,
             bulletType: 0,
-            invincibilityTime: 1300
+            invincibilityTime: 1300,
+            dmgSound: "damage_sound.mp3",
+            dmgVol: 0.5,
+            deathSound: "explosion.wav",
+            deathVol: 1
         },
         {
             name: "zoomer",
@@ -747,7 +786,11 @@ export class Player extends GameObject{
             actADelay: 260,
             rotSpeed: 7,
             bulletType: 1,
-            invincibilityTime: 1300
+            invincibilityTime: 1300,
+            dmgSound: "damage_sound.mp3",
+            dmgVol: 0.5,
+            deathSound: "explosion.wav",
+            deathVol: 1
         },
         {
             name: "sniper",
@@ -761,7 +804,11 @@ export class Player extends GameObject{
             actADelay: 530,
             rotSpeed: 4,
             bulletType: 2,
-            invincibilityTime: 1300
+            invincibilityTime: 1300,
+            dmgSound: "damage_sound.mp3",
+            dmgVol: 0.5,
+            deathSound: "explosion.wav",
+            deathVol: 1
         },
         {
             name: "blobber",
@@ -775,7 +822,11 @@ export class Player extends GameObject{
             actADelay: 190,
             rotSpeed: 5,
             bulletType: 3,
-            invincibilityTime: 1300
+            invincibilityTime: 1300,
+            dmgSound: "damage_sound.mp3",
+            dmgVol: 0.5,
+            deathSound: "explosion.wav",
+            deathVol: 1
         }
     ];
 
@@ -805,6 +856,7 @@ export class Player extends GameObject{
     die(){
         if(this.alive){
             super.die();
+            playSound3(AUDIO_DIR+this.stats.deathSound,this.stats.deathVol,this.game);
             this.game.setGameState(GameInstance.STATE_LOST);
         }
     }
@@ -903,6 +955,7 @@ export class Player extends GameObject{
     }
     heal(amount){
         if(this.alive && !this.game.activeModifiers.includes(GameInstance.MOD_NO_HEALS_ID)){
+            playSound3(AUDIO_DIR+Player.HEAL_SOUND,Player.HEAL_VOL,this.game);
             this.health += amount;
             if(this.health > this.stats.maxHealth){
                 this.health = this.stats.maxHealth;
@@ -912,6 +965,7 @@ export class Player extends GameObject{
     }
     takeDamage(dmg) {
         if(this.timerInvincibility <= 0 && dmg > 0 && !DEBUG_INVINCIBLE_PLAYER){
+            playSound3(AUDIO_DIR+this.stats.dmgSound,this.stats.dmgVol,this.game);
             super.takeDamage(dmg);
             this.game.elements.healthText.innerText = this.health+"";
         }
@@ -977,8 +1031,11 @@ export class Bullet extends GameObject{
             dec: 0,
             startSpeed: 20,
             maxSpeed: 20,
-            piercing: 0
-
+            piercing: 0,
+            audio: "blaster_a.wav",
+            audioVol: 0.2,
+            hitSound: "bullet_hit_a.mp3",
+            hitVol: 0.15
         },
         {
             name: "default_weak",
@@ -990,8 +1047,11 @@ export class Bullet extends GameObject{
             dec: 0,
             startSpeed: 20,
             maxSpeed: 20,
-            piercing: 0
-
+            piercing: 0,
+            audio: "blaster_a.wav",
+            audioVol: 0.2,
+            hitSound: "bullet_hit_a.mp3",
+            hitVol: 0.15
         },
         {
             name: "default_strong",
@@ -1003,8 +1063,11 @@ export class Bullet extends GameObject{
             dec: 0,
             startSpeed: 25,
             maxSpeed: 25,
-            piercing: 1
-
+            piercing: 1,
+            audio: "blaster_a.wav",
+            audioVol: 0.2,
+            hitSound: "bullet_hit_a.mp3",
+            hitVol: 0.15
         },
         {
             name: "default_slow",
@@ -1016,13 +1079,17 @@ export class Bullet extends GameObject{
             dec: 0.5,
             startSpeed: 17,
             maxSpeed: 17,
-            piercing: 0
-
+            piercing: 0,
+            audio: "blaster_a.wav",
+            audioVol: 0.2,
+            hitSound: "bullet_hit_a.mp3",
+            hitVol: 0.15
         }
 ];
     static TAG = "bullet";
     constructor(type, x, y, rot, game) {
         super(1,x,y,rot,"",Bullet.statsRegistry[type].collider,game);
+        playSound3(AUDIO_DIR+Bullet.statsRegistry[type].audio,Bullet.statsRegistry[type].audioVol,this.game);
         //console.log("hi from bullet");
         this.TAG = Bullet.TAG;
 
@@ -1091,6 +1158,7 @@ export class Bullet extends GameObject{
 
         for(let i = 0; i < this.registeredCollisions.length && this.availableHits > 0; i++){
             if(this.registeredCollisions[i].isEnemy && !this.hittedObjs.includes(this.registeredCollisions[i])){
+                playSound3(AUDIO_DIR+this.stats.hitSound,this.stats.hitVol,this.game);
                 this.hittedObjs.push(this.registeredCollisions[i]);
                 this.availableHits--;
                 this.registeredCollisions[i].takeDamage(this.stats.dmg);
@@ -1518,6 +1586,7 @@ export class CTFObjective extends GameObject{
     }
 
     collect(){
+        playSound3(AUDIO_DIR+"coin_collect.wav",0.4,this.game);
         this.game.gameMode.increasePoints(CTFObjective.POINTS_FOR_CAPTURE);
         this.game.managedObjs.push(new CTFObjective(null,null,this.game));
         this.die();

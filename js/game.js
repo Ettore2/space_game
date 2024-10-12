@@ -12,7 +12,9 @@ const FRAMES_DELAY = 20;
 //check js session
 if(sessionStorage.getItem(SESSION_GAME_MODE_ID) == null ||
     sessionStorage.getItem(SESSION_SPACESHIP_ID) == null ||
-    sessionStorage.getItem(SESSION_MODIFIERS_IDS) == null){
+    sessionStorage.getItem(SESSION_MODIFIERS_IDS) == null ||
+    sessionStorage.getItem(SESSION_GAME_MODE_ID) === "" ||
+    sessionStorage.getItem(SESSION_SPACESHIP_ID) === ""){
     window.location.href = "./menu.html";
 
 }
