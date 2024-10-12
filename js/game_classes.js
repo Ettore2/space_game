@@ -1033,7 +1033,7 @@ export class Bullet extends GameObject{
             maxSpeed: 20,
             piercing: 0,
             audio: "blaster_a.wav",
-            audioVol: 0.2,
+            audioVol: 0.1,
             hitSound: "bullet_hit_a.mp3",
             hitVol: 0.15
         },
@@ -1049,7 +1049,7 @@ export class Bullet extends GameObject{
             maxSpeed: 20,
             piercing: 0,
             audio: "blaster_a.wav",
-            audioVol: 0.2,
+            audioVol: 0.1,
             hitSound: "bullet_hit_a.mp3",
             hitVol: 0.15
         },
@@ -1065,7 +1065,7 @@ export class Bullet extends GameObject{
             maxSpeed: 25,
             piercing: 1,
             audio: "blaster_a.wav",
-            audioVol: 0.2,
+            audioVol: 0.1,
             hitSound: "bullet_hit_a.mp3",
             hitVol: 0.15
         },
@@ -1081,7 +1081,7 @@ export class Bullet extends GameObject{
             maxSpeed: 17,
             piercing: 0,
             audio: "blaster_a.wav",
-            audioVol: 0.2,
+            audioVol: 0.1,
             hitSound: "bullet_hit_a.mp3",
             hitVol: 0.15
         }
